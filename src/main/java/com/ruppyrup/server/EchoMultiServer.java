@@ -6,12 +6,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class EchoMultiServer {
     private boolean enableServer = true;
     private final ExecutorService executorService;
+    private Map<String, Socket> clients = new HashMap<>();
 
     public EchoMultiServer() {
         this.executorService = Executors.newFixedThreadPool(200);
@@ -37,17 +42,24 @@ public class EchoMultiServer {
         enableServer = false;
     }
 
-    private static class EchoClientHandler implements Runnable {
+    private class EchoClientHandler implements Runnable {
         private Socket clientSocket;
+        private String clientId;
 
         public EchoClientHandler(Socket socket) {
             this.clientSocket = socket;
-            System.out.println("Connected to client " + socket.getInetAddress() + "::" + socket.getPort());
+            clientId = socket.getInetAddress() + "::" + socket.getPort();
+            System.out.println("Connected to client " + clientId);
+            clients.put(clientId, socket);
         }
 
         public void run() {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+
+//                clients.keySet().stream()
+//                        .filter(k -> !clientId.equals(k))
+//                        .forEach(out::print);
 
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
@@ -61,6 +73,7 @@ public class EchoMultiServer {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
+                System.out.println("Client closed:: " + clientId);
                 try {
                     clientSocket.close();
                 } catch (IOException e) {

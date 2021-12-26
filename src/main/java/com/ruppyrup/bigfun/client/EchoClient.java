@@ -37,7 +37,7 @@ public class EchoClient extends Service<EmailLoginResult> {
 
 
             while(true) {
-
+//                System.out.println("Starting read from server.... " + in.readLine());
             }
 
 //            Scanner keyboard = new Scanner(System.in);
@@ -55,6 +55,15 @@ public class EchoClient extends Service<EmailLoginResult> {
             stopConnection();
         }
         return EmailLoginResult.FAILED_BY_CREDENTIALS;
+    }
+
+    public String getOtherClients() {
+        try {
+            return in.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public String sendMessage(String msg) {

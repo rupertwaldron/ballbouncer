@@ -128,6 +128,7 @@ public class AnimationController implements Initializable {
 
         echoClient = new EchoClient("127.0.0.1", 6666);
         echoClient.start();
+//        echoClient.getOtherClients();
         echoClient.setOnSucceeded(event -> {
             System.out.println("Succeeded :: " + echoClient.getValue());
         });
