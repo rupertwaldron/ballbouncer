@@ -1,11 +1,15 @@
 package com.ruppyrup.bigfun;
 
 import com.jfoenix.controls.JFXButton;
+import com.ruppyrup.bigfun.client.EchoClient;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -19,6 +23,7 @@ import java.util.ResourceBundle;
 public class AnimationController implements Initializable {
 
     private Queue<MouseEvent> mouseEvents = new LinkedList<>();
+    private EchoClient echoClient;
 
     private int counter;
 
@@ -55,11 +60,12 @@ public class AnimationController implements Initializable {
     @FXML
     void onMousePressed(MouseEvent event) {
 
-        if (counter++ == 10) {
+//        if (counter++ == 10) {
             mouseEvents.add(event);
-            counter = 0;
-        }
-
+//            counter = 0;
+//        }
+        String serverResponse = echoClient.sendMessage("{" + event.getX() + ":" + event.getY() + "}");
+        System.out.println(serverResponse);
         buttonTransition();
 
 //        transition.setOnFinished(e -> {
@@ -104,15 +110,26 @@ public class AnimationController implements Initializable {
 
     @FXML
     void onMouseMoved(MouseEvent event) throws InterruptedException {
-        if (counter++ == 10) {
-            mouseEvents.add(event);
-            counter = 0;
-        }
-        buttonTransition();
+//        if (counter++ == 10) {
+//            mouseEvents.add(event);
+//            counter = 0;
+//        }
+//        buttonTransition();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        Button friendButton = new Button("Friend");
+        friendButton.setLayoutX(50.0);
+        friendButton.setLayoutY(50.0);
+        friendButton.setStyle("-fx-background-color: #00ff55");
+        anchorPane.getChildren().add(friendButton);
+
+        echoClient = new EchoClient("127.0.0.1", 6666);
+        echoClient.start();
+        echoClient.setOnSucceeded(event -> {
+            System.out.println("Succeeded :: " + echoClient.getValue());
+        });
     }
 }
