@@ -51,7 +51,6 @@ public class EchoMultiServer {
                     }
                     out.println("[Server] " + inputLine);
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

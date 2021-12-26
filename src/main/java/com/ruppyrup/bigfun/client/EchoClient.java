@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class EchoClient {
     private Socket clientSocket;
@@ -23,10 +24,20 @@ public class EchoClient {
             clientSocket = new Socket(ip, port);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String response = sendMessage("Hello from echo client");
-            System.out.println("Response from server -> " + response);
+
+            Scanner keyboard = new Scanner(System.in);
+            System.out.print("% ");
+            while (keyboard.hasNext()) {
+                String next = keyboard.nextLine();
+                if (".".equals(next)) break;
+                String response = sendMessage(next);
+                System.out.println("Response from server -> " + response);
+                System.out.print("% ");
+            }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            stopConnection();
         }
 
     }
