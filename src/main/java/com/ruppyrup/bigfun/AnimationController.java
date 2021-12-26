@@ -3,23 +3,18 @@ package com.ruppyrup.bigfun;
 import com.jfoenix.controls.JFXButton;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.scene.control.Alert;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
 import javafx.util.Duration;
 
 import java.net.URL;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.ResourceBundle;
-import java.util.Stack;
 
 public class AnimationController implements Initializable {
 
