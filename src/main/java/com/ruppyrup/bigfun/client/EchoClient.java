@@ -1,5 +1,10 @@
 package com.ruppyrup.bigfun.client;
 
+import com.ruppyrup.bigfun.AnimationController;
+import com.ruppyrup.bigfun.Command;
+import com.ruppyrup.bigfun.clientcommands.CommandFactory;
+import com.ruppyrup.bigfun.clientcommands.EchoCommands;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
@@ -11,14 +16,19 @@ import java.net.Socket;
 
 public class EchoClient extends Service<EchoClientResult> {
     private Socket clientSocket;
+    private final AnimationController animationController;
     private PrintWriter out;
     private BufferedReader in;
     private final String ipAddress;
     private final int port;
+    private Command command;
+    private final CommandFactory commandFactory;
 
-    public EchoClient(String ipAddress, int port) {
+    public EchoClient(AnimationController animationController, String ipAddress, int port) {
+        this.animationController = animationController;
         this.ipAddress = ipAddress;
         this.port = port;
+        this.commandFactory = new CommandFactory(animationController);
     }
 
 //    public static void main(String[] args) {
@@ -36,7 +46,11 @@ public class EchoClient extends Service<EchoClientResult> {
 
 
             while(true) {
-                System.out.println("Reading from server.... " + in.readLine());
+                String[] serverInput = in.readLine().split(">");
+                System.out.println(serverInput[0] + ">" + serverInput[1]);
+                command = commandFactory.getCommand(EchoCommands.valueOf(serverInput[0]), serverInput[1]);
+                command.execute();
+//                Platform.runLater(() -> animationController.addNewButton("newbutton"));
             }
 
 //            Scanner keyboard = new Scanner(System.in);
@@ -51,6 +65,7 @@ public class EchoClient extends Service<EchoClientResult> {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
+            System.out.println("Closing connection on port :: " + port);
             stopConnection();
         }
         return EchoClientResult.SUCCESS;

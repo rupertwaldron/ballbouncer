@@ -6,12 +6,14 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.ruppyrup.bigfun.clientcommands.EchoCommands.ADD_PLAYER;
+import static com.ruppyrup.bigfun.clientcommands.EchoCommands.CO_ORD;
+import static com.ruppyrup.bigfun.clientcommands.EchoCommands.REMOVE_PLAYER;
 
 public class EchoMultiServer {
     private boolean enableServer = true;
@@ -56,7 +58,7 @@ public class EchoMultiServer {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-                clients.forEach((key, value) -> value.println("ADD_PLAYER>" + clientId));
+                clients.forEach((key, value) -> value.println(ADD_PLAYER + ">" + clientId));
 
                 clients.put(clientId, out);
 
@@ -67,7 +69,7 @@ public class EchoMultiServer {
                         out.println("bye");
                         break;
                     }
-                    String sendMessage = "{" + clientId + ">" + inputLine + "}";
+                    String sendMessage = CO_ORD + ">" +  clientId + "%" + inputLine;
                     clients.forEach((key, value) -> value.println(sendMessage));
 //                    out.println("[Server] " + inputLine);
                 }
@@ -76,7 +78,7 @@ public class EchoMultiServer {
             } finally {
                 System.out.println("Client closed:: " + clientId);
                 clients.remove(clientId);
-                clients.forEach((key, value) -> value.println("REMOVE_PLAYER>" + clientId));
+                clients.forEach((key, value) -> value.println(REMOVE_PLAYER + ">" + clientId));
                 try {
                     clientSocket.close();
                 } catch (IOException e) {

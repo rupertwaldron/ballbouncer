@@ -16,6 +16,7 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class AnimationController implements Initializable {
@@ -37,21 +38,22 @@ public class AnimationController implements Initializable {
     @FXML
     void onClick(ActionEvent event) {
         System.out.println("Clicked button");
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(4));
-        transition.setNode(button);
-        transition.setToY(-200);
-        transition.setToX(-100);
-
-        transition.setAutoReverse(true);
-        transition.setCycleCount(2);
-        transition.play();
-
-        transition.setOnFinished(e -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("Completed");
-            alert.show();
-        });
+        addNewButton("trev");
+//        TranslateTransition transition = new TranslateTransition();
+//        transition.setDuration(Duration.seconds(4));
+//        transition.setNode(button);
+//        transition.setToY(-200);
+//        transition.setToX(-100);
+//
+//        transition.setAutoReverse(true);
+//        transition.setCycleCount(2);
+//        transition.play();
+//
+//        transition.setOnFinished(e -> {
+//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//            alert.setHeaderText("Completed");
+//            alert.show();
+//        });
 //        button.setStyle("-fx-background-color: #00ff00");
     }
 
@@ -62,7 +64,7 @@ public class AnimationController implements Initializable {
             mouseEvents.add(event);
 //            counter = 0;
 //        }
-        String serverResponse = echoClient.sendMessage("{" + event.getX() + ":" + event.getY() + "}");
+        String serverResponse = echoClient.sendMessage(event.getX() + ":" + event.getY());
         System.out.println(serverResponse);
         buttonTransition();
 
@@ -117,18 +119,33 @@ public class AnimationController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        Button friendButton = new Button("Friend");
-        friendButton.setLayoutX(50.0);
-        friendButton.setLayoutY(50.0);
-        friendButton.setStyle("-fx-background-color: #00ff55");
-        anchorPane.getChildren().add(friendButton);
-
-        echoClient = new EchoClient("127.0.0.1", 6666);
+        echoClient = new EchoClient(this, "127.0.0.1", 6666);
         echoClient.start();
 //        echoClient.getOtherClients();
         echoClient.setOnSucceeded(event -> {
             System.out.println("Succeeded :: " + echoClient.getValue());
         });
+    }
+
+    public void addNewButton(String id) {
+        System.out.println("Adding new button");
+        Random random = new Random();
+        Button friendButton = new Button(id);
+        friendButton.setLayoutX(random.nextDouble() * 400.0);
+        friendButton.setLayoutY(random.nextDouble() * 400.0);
+
+        String color = Integer.toHexString(random.nextInt(255))
+                + Integer.toHexString(random.nextInt(255))
+                + Integer.toHexString(random.nextInt(255));
+        System.out.println("Color :: " + color);
+
+        friendButton.setStyle("-fx-background-color: #" + color);
+        try {
+            anchorPane.getChildren().add(friendButton);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println("Added button finished");
+        }
     }
 }
