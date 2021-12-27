@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 public class EchoMultiServer {
     private boolean enableServer = true;
     private final ExecutorService executorService;
-    private Map<String, Socket> clients = new HashMap<>();
+    private Map<String, PrintWriter> clients = new HashMap<>();
 
     public EchoMultiServer() {
         this.executorService = Executors.newFixedThreadPool(200);
@@ -50,16 +50,13 @@ public class EchoMultiServer {
             this.clientSocket = socket;
             clientId = socket.getInetAddress() + "::" + socket.getPort();
             System.out.println("Connected to client " + clientId);
-            clients.put(clientId, socket);
         }
 
         public void run() {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-//                clients.keySet().stream()
-//                        .filter(k -> !clientId.equals(k))
-//                        .forEach(out::print);
+                clients.put(clientId, out);
 
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
@@ -68,12 +65,15 @@ public class EchoMultiServer {
                         out.println("bye");
                         break;
                     }
-                    out.println("[Server] " + inputLine);
+                    String sendMessage = "{" + clientId + ">" + inputLine + "}";
+                    clients.forEach((key, value) -> value.println(sendMessage));
+//                    out.println("[Server] " + inputLine);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 System.out.println("Client closed:: " + clientId);
+                clients.remove(clientId);
                 try {
                     clientSocket.close();
                 } catch (IOException e) {

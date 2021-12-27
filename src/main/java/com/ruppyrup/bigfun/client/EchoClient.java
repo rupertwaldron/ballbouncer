@@ -37,7 +37,7 @@ public class EchoClient extends Service<EmailLoginResult> {
 
 
             while(true) {
-//                System.out.println("Starting read from server.... " + in.readLine());
+                System.out.println("Reading from server.... " + in.readLine());
             }
 
 //            Scanner keyboard = new Scanner(System.in);
@@ -68,13 +68,13 @@ public class EchoClient extends Service<EmailLoginResult> {
 
     public String sendMessage(String msg) {
         out.println(msg);
-        String resp = null;
-        try {
-            resp = in.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return resp;
+//        String resp = null;
+//        try {
+//            resp = in.readLine();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        return msg;
     }
 
     public void stopConnection() {
