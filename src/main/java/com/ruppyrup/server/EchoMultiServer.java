@@ -56,6 +56,8 @@ public class EchoMultiServer {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
+                clients.forEach((key, value) -> value.println("ADD_PLAYER>" + clientId));
+
                 clients.put(clientId, out);
 
                 String inputLine;
@@ -74,6 +76,7 @@ public class EchoMultiServer {
             } finally {
                 System.out.println("Client closed:: " + clientId);
                 clients.remove(clientId);
+                clients.forEach((key, value) -> value.println("REMOVE_PLAYER>" + clientId));
                 try {
                     clientSocket.close();
                 } catch (IOException e) {

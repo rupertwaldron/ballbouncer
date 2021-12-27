@@ -1,6 +1,6 @@
 package com.ruppyrup.bigfun.client;
 
-public enum EmailLoginResult {
+public enum EchoClientResult {
     SUCCESS,
     FAILED_BY_CREDENTIALS,
     FAILED_BY_NETWORK,

@@ -8,9 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 
-public class EchoClient extends Service<EmailLoginResult> {
+public class EchoClient extends Service<EchoClientResult> {
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
@@ -29,7 +28,7 @@ public class EchoClient extends Service<EmailLoginResult> {
 ////        System.out.println("Response from server -> " + response);
 //    }
 
-    private EmailLoginResult startConnection() {
+    private EchoClientResult startConnection() {
         try {
             clientSocket = new Socket(ipAddress, port);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -54,7 +53,7 @@ public class EchoClient extends Service<EmailLoginResult> {
         } finally {
             stopConnection();
         }
-        return EmailLoginResult.FAILED_BY_CREDENTIALS;
+        return EchoClientResult.SUCCESS;
     }
 
     public String getOtherClients() {
@@ -88,10 +87,10 @@ public class EchoClient extends Service<EmailLoginResult> {
     }
 
     @Override
-    protected Task<EmailLoginResult> createTask() {
+    protected Task<EchoClientResult> createTask() {
         return new Task<>() {
             @Override
-            protected EmailLoginResult call() throws Exception {
+            protected EchoClientResult call() throws Exception {
                 return startConnection();
             }
         };
