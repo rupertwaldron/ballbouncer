@@ -58,7 +58,10 @@ public class EchoMultiServer {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-                clients.forEach((key, value) -> value.println(ADD_PLAYER + ">" + clientId));
+                clients.forEach((key, value) -> {
+                    value.println(ADD_PLAYER + ">" + clientId);
+                    out.println(ADD_PLAYER + ">" + key);
+                });
 
                 clients.put(clientId, out);
 
