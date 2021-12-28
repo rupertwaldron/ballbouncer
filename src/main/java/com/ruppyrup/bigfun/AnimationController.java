@@ -103,8 +103,8 @@ public class AnimationController implements Initializable {
             double mouseX = event.getX();
             double mouseY = event.getY();
 
-            double deltaX = mouseX - buttonX - 40.0;
-            double deltaY = mouseY - buttonY - 40.0;
+            double deltaX = mouseX - buttonX - 20.0;
+            double deltaY = mouseY - buttonY - 20.0;
 
             transition.setToX(deltaX);
             transition.setToY(deltaY);
@@ -119,11 +119,12 @@ public class AnimationController implements Initializable {
 
     @FXML
     void onMouseMoved(MouseEvent event) throws InterruptedException {
-//        if (counter++ == 10) {
-//            mouseEvents.add(event);
-//            counter = 0;
-//        }
-//        buttonTransition();
+        if (counter++ == 10) {
+            mouseEvents.add(event);
+            echoClient.sendMessage(event.getX() + ":" + event.getY());
+            counter = 0;
+        }
+        buttonTransition();
     }
 
     @Override
