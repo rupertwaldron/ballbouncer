@@ -14,7 +14,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -23,6 +25,7 @@ public class AnimationController implements Initializable {
 
     private Queue<MouseEvent> mouseEvents = new LinkedList<>();
     private EchoClient echoClient;
+    private Map<String, JFXButton> buttons = new HashMap<>();
 
     private int counter;
 
@@ -82,7 +85,7 @@ public class AnimationController implements Initializable {
         transition.setDuration(Duration.millis(300));
         transition.setNode(button);
 
-        System.out.println("button layout x ::" +button.getLayoutX());
+        System.out.println("button layout x ::" + button.getLayoutX());
 
         while (!mouseEvents.isEmpty()) {
 
@@ -130,7 +133,7 @@ public class AnimationController implements Initializable {
     public void addNewButton(String id) {
         System.out.println("Adding new button");
         Random random = new Random();
-        Button friendButton = new Button(id);
+        JFXButton friendButton = new JFXButton(id);
         friendButton.setLayoutX(random.nextDouble() * 400.0);
         friendButton.setLayoutY(random.nextDouble() * 400.0);
 
@@ -140,6 +143,9 @@ public class AnimationController implements Initializable {
         System.out.println("Color :: " + color);
 
         friendButton.setStyle("-fx-background-color: #" + color);
+
+        buttons.put(id, friendButton);
+
         try {
             anchorPane.getChildren().add(friendButton);
         } catch (Exception e) {
@@ -147,5 +153,28 @@ public class AnimationController implements Initializable {
         } finally {
             System.out.println("Added button finished");
         }
+    }
+
+    public void moveButton(String id, double xValue, double yValue) {
+
+        JFXButton buttonToMove = buttons.get(id);
+
+        if (buttonToMove == null) return; // if own button or button doesn't exist
+
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.millis(300));
+        transition.setNode(buttonToMove);
+
+        System.out.println("button layout x ::" + buttonToMove.getLayoutX());
+
+        double buttonX = buttonToMove.getLayoutX();
+        double buttonY = buttonToMove.getLayoutY();
+
+        double deltaX = xValue - buttonX - 40.0;
+        double deltaY = yValue - buttonY - 40.0;
+
+        transition.setToX(deltaX);
+        transition.setToY(deltaY);
+        transition.play();
     }
 }
