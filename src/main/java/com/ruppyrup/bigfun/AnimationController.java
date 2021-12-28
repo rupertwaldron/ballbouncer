@@ -6,11 +6,16 @@ import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -25,7 +30,7 @@ public class AnimationController implements Initializable {
 
     private Queue<MouseEvent> mouseEvents = new LinkedList<>();
     private EchoClient echoClient;
-    private Map<String, JFXButton> buttons = new HashMap<>();
+    private Map<String, Button> buttons = new HashMap<>();
 
     private int counter;
 
@@ -133,16 +138,22 @@ public class AnimationController implements Initializable {
     public void addNewButton(String id) {
         System.out.println("Adding new button");
         Random random = new Random();
-        JFXButton friendButton = new JFXButton(id);
+        String name = id.substring(12);
+        Button friendButton = new Button(name);
+        friendButton.getStyleClass().add("button-raised");
+        friendButton.setMinSize(40, 40);
         friendButton.setLayoutX(random.nextDouble() * 400.0);
         friendButton.setLayoutY(random.nextDouble() * 400.0);
+        friendButton.setBackground(new Background(new BackgroundFill(Color.AZURE, new CornerRadii(40), Insets.EMPTY)));
 
-        String color = Integer.toHexString(random.nextInt(255))
-                + Integer.toHexString(random.nextInt(255))
-                + Integer.toHexString(random.nextInt(255));
-        System.out.println("Color :: " + color);
+//        String color = Integer.toHexString(random.nextInt(255))
+//                + Integer.toHexString(random.nextInt(255))
+//                + Integer.toHexString(random.nextInt(255));
+//        System.out.println("Color :: " + color);
 
-        friendButton.setStyle("-fx-background-color: #" + color);
+        friendButton.setStyle("-fx-background-color: #00ffff");
+        friendButton.setStyle("-fx-background-radius: 2000");
+
 
         buttons.put(id, friendButton);
 
@@ -157,7 +168,7 @@ public class AnimationController implements Initializable {
 
     public void moveButton(String id, double xValue, double yValue) {
 
-        JFXButton buttonToMove = buttons.get(id);
+        Button buttonToMove = buttons.get(id);
 
         if (buttonToMove == null) return; // if own button or button doesn't exist
 
