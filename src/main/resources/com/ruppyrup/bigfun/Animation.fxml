@@ -19,7 +19,7 @@
       </ImageView>
       <AnchorPane fx:id="anchorPane" onMouseMoved="#onMouseMoved" onMousePressed="#onMousePressed" prefHeight="200.0" prefWidth="200.0">
          <children>
-            <JFXButton fx:id="button" layoutX="273.0" layoutY="285.0" onAction="#onClick" prefHeight="69.0" prefWidth="67.0" style="-fx-background-color: #ff0000; -fx-background-radius: 2000; -fx-text-fill: #ffffff;" text="Click Me" />
+            <JFXButton fx:id="button" layoutX="273.0" layoutY="285.0" onAction="#onClick" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #ff0000; -fx-background-radius: 2000; -fx-text-fill: #ffffff;" text="Me" />
          </children></AnchorPane>
    </children>
 </StackPane>

@@ -16,6 +16,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -138,21 +139,21 @@ public class AnimationController implements Initializable {
     public void addNewButton(String id) {
         System.out.println("Adding new button");
         Random random = new Random();
-        String name = id.substring(12);
-        Button friendButton = new Button(name);
-        friendButton.getStyleClass().add("button-raised");
+        String name = id.substring(15);
+        String color = Integer.toHexString(random.nextInt(255))
+                + Integer.toHexString(random.nextInt(255))
+                + Integer.toHexString(random.nextInt(255));
+        System.out.println("Color :: " + color);
+        JFXButton friendButton = new JFXButton(name);
+        friendButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
         friendButton.setMinSize(40, 40);
+        friendButton.setTextFill(Paint.valueOf("#FFFFFF"));
+        friendButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
+        friendButton.setButtonType(JFXButton.ButtonType.RAISED);
         friendButton.setLayoutX(random.nextDouble() * 400.0);
         friendButton.setLayoutY(random.nextDouble() * 400.0);
-        friendButton.setBackground(new Background(new BackgroundFill(Color.AZURE, new CornerRadii(40), Insets.EMPTY)));
 
-//        String color = Integer.toHexString(random.nextInt(255))
-//                + Integer.toHexString(random.nextInt(255))
-//                + Integer.toHexString(random.nextInt(255));
-//        System.out.println("Color :: " + color);
 
-        friendButton.setStyle("-fx-background-color: #00ffff");
-        friendButton.setStyle("-fx-background-radius: 2000");
 
 
         buttons.put(id, friendButton);
@@ -181,8 +182,8 @@ public class AnimationController implements Initializable {
         double buttonX = buttonToMove.getLayoutX();
         double buttonY = buttonToMove.getLayoutY();
 
-        double deltaX = xValue - buttonX - 40.0;
-        double deltaY = yValue - buttonY - 40.0;
+        double deltaX = xValue - buttonX - 20.0;
+        double deltaY = yValue - buttonY - 20.0;
 
         transition.setToX(deltaX);
         transition.setToY(deltaY);
