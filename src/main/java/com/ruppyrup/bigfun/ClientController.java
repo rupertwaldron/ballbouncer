@@ -2,20 +2,14 @@ package com.ruppyrup.bigfun;
 
 import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.client.EchoClient;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -28,7 +22,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-public class AnimationController implements Initializable {
+public class ClientController implements Initializable {
 
     private Queue<MouseEvent> mouseEvents = new LinkedList<>();
     private EchoClient echoClient;
@@ -55,6 +49,16 @@ public class AnimationController implements Initializable {
     }
 
     @FXML
+    void onMouseMoved(MouseEvent event) throws InterruptedException {
+        if (counter++ == 10) {
+            mouseEvents.add(event);
+            echoClient.sendMessage(event.getX() + ":" + event.getY());
+            counter = 0;
+        }
+        buttonTransition();
+    }
+
+    @FXML
     void onMousePressed(MouseEvent event) {
 //        mouseEvents.add(event);
         String serverResponse = echoClient.sendMessage(event.getX() + ":" + event.getY());
@@ -63,6 +67,16 @@ public class AnimationController implements Initializable {
 
         System.out.println("X Value :: " + event.getX());
         System.out.println("Y Value :: " + event.getY());
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        echoClient = new EchoClient(this, "127.0.0.1", 6666);
+        echoClient.start();
+
+        echoClient.setOnSucceeded(event -> {
+            System.out.println("Succeeded :: " + echoClient.getValue());
+        });
     }
 
     private void buttonTransition() {
@@ -87,63 +101,6 @@ public class AnimationController implements Initializable {
             transition.setToY(deltaY);
             transition.play();
         }
-    }
-
-
-    @FXML
-    void onMouseMoved(MouseEvent event) throws InterruptedException {
-        if (counter++ == 10) {
-            mouseEvents.add(event);
-            echoClient.sendMessage(event.getX() + ":" + event.getY());
-            counter = 0;
-        }
-        buttonTransition();
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        echoClient = new EchoClient(this, "127.0.0.1", 6666);
-        echoClient.start();
-//        echoClient.getOtherClients();
-
-        ball = new Circle(15, Color.BLUE);
-        ball.relocate(100, 100);
-        anchorPane.getChildren().add(ball);
-        bounceBall();
-
-        echoClient.setOnSucceeded(event -> {
-            System.out.println("Succeeded :: " + echoClient.getValue());
-        });
-    }
-
-    private void bounceBall() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), new EventHandler<ActionEvent>() {
-
-            double dx = 3; //Step on x or velocity
-            double dy = 3; //Step on y
-
-            @Override
-            public void handle(ActionEvent t) {
-                //move the ball
-                ball.setLayoutX(ball.getLayoutX() + dx);
-                ball.setLayoutY(ball.getLayoutY() + dy);
-
-                Bounds bounds = anchorPane.getLayoutBounds();
-                final boolean atRightBorder = ball.getLayoutX() >= (bounds.getMaxX() - ball.getRadius());
-                final boolean atLeftBorder = ball.getLayoutX() <= (bounds.getMinX() + ball.getRadius());
-                final boolean atBottomBorder = ball.getLayoutY() >= (bounds.getMaxY() - ball.getRadius());
-                final boolean atTopBorder = ball.getLayoutY() <= (bounds.getMinY() + ball.getRadius());
-
-                if (atRightBorder || atLeftBorder) {
-                    dx *= -1;
-                }
-                if (atBottomBorder || atTopBorder) {
-                    dy *= -1;
-                }
-            }
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
     }
 
     public void addNewButton(String id) {

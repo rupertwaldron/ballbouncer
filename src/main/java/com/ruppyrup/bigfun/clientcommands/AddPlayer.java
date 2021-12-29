@@ -1,15 +1,15 @@
 package com.ruppyrup.bigfun.clientcommands;
 
-import com.ruppyrup.bigfun.AnimationController;
+import com.ruppyrup.bigfun.ClientController;
 import com.ruppyrup.bigfun.Command;
 import javafx.application.Platform;
 
 public class AddPlayer implements Command {
 
-    private final AnimationController animationController;
+    private final ClientController animationController;
     private final String id;
 
-    public AddPlayer(AnimationController animationController, String id) {
+    public AddPlayer(ClientController animationController, String id) {
         this.animationController = animationController;
         this.id = id;
     }

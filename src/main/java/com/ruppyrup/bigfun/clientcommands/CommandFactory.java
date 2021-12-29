@@ -1,13 +1,13 @@
 package com.ruppyrup.bigfun.clientcommands;
 
-import com.ruppyrup.bigfun.AnimationController;
+import com.ruppyrup.bigfun.ClientController;
 import com.ruppyrup.bigfun.Command;
 
 public class CommandFactory {
 
-    private final AnimationController animationController;
+    private final ClientController animationController;
 
-    public CommandFactory(AnimationController animationController) {
+    public CommandFactory(ClientController animationController) {
         this.animationController = animationController;
     }
 

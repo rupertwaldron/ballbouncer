@@ -6,13 +6,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class AnimationTutorial extends Application {
+public class ServerApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("Animation.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("server.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
+        primaryStage.setTitle("Echo Server");
         primaryStage.show();
     }
 
@@ -20,3 +21,4 @@ public class AnimationTutorial extends Application {
         launch(args);
     }
 }
+

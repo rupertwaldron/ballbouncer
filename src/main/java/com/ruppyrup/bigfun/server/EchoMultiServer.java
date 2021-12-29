@@ -1,4 +1,8 @@
-package com.ruppyrup.server;
+package com.ruppyrup.bigfun.server;
+
+import com.ruppyrup.bigfun.client.EchoClientResult;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +19,7 @@ import static com.ruppyrup.bigfun.clientcommands.EchoCommands.ADD_PLAYER;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.CO_ORD;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.REMOVE_PLAYER;
 
-public class EchoMultiServer {
+public class EchoMultiServer extends Service<EchoClientResult>  {
     private boolean enableServer = true;
     private final ExecutorService executorService;
     private Map<String, PrintWriter> clients = new HashMap<>();
@@ -24,19 +28,32 @@ public class EchoMultiServer {
         this.executorService = Executors.newFixedThreadPool(200);
     }
 
-    public static void main(String[] args) {
-        EchoMultiServer server = new EchoMultiServer();
-        server.start(6666);
-
+    @Override
+    protected Task<EchoClientResult> createTask() {
+        return new Task<>() {
+            @Override
+            protected EchoClientResult call() throws Exception {
+                return startServer(6666);
+            }
+        };
     }
 
-    public void start(int port) {
+//    public static void main(String[] args) {
+//        EchoMultiServer server = new EchoMultiServer();
+//        server.start(6666);
+//
+//    }
+
+    public EchoClientResult startServer(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)){
             System.out.println("Server is running");
             while (enableServer)
                 executorService.execute(new EchoClientHandler(serverSocket.accept()));
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            System.out.println("Server stopped");
+            return EchoClientResult.SUCCESS;
         }
     }
 

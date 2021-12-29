@@ -1,10 +1,9 @@
 package com.ruppyrup.bigfun.client;
 
-import com.ruppyrup.bigfun.AnimationController;
+import com.ruppyrup.bigfun.ClientController;
 import com.ruppyrup.bigfun.Command;
 import com.ruppyrup.bigfun.clientcommands.CommandFactory;
 import com.ruppyrup.bigfun.clientcommands.EchoCommands;
-import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
@@ -16,7 +15,7 @@ import java.net.Socket;
 
 public class EchoClient extends Service<EchoClientResult> {
     private Socket clientSocket;
-    private final AnimationController animationController;
+    private final ClientController animationController;
     private PrintWriter out;
     private BufferedReader in;
     private final String ipAddress;
@@ -24,7 +23,7 @@ public class EchoClient extends Service<EchoClientResult> {
     private Command command;
     private final CommandFactory commandFactory;
 
-    public EchoClient(AnimationController animationController, String ipAddress, int port) {
+    public EchoClient(ClientController animationController, String ipAddress, int port) {
         this.animationController = animationController;
         this.ipAddress = ipAddress;
         this.port = port;
