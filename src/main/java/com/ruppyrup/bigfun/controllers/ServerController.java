@@ -1,4 +1,4 @@
-package com.ruppyrup.bigfun;
+package com.ruppyrup.bigfun.controllers;
 
 import com.ruppyrup.bigfun.server.EchoMultiServer;
 import javafx.animation.KeyFrame;

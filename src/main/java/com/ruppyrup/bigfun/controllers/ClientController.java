@@ -1,4 +1,4 @@
-package com.ruppyrup.bigfun;
+package com.ruppyrup.bigfun.controllers;
 
 import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.client.EchoClient;

@@ -13,4 +13,6 @@ module com.ruppyrup.bigfun {
     exports com.ruppyrup.bigfun;
     exports com.ruppyrup.bigfun.clientcommands;
     opens com.ruppyrup.bigfun.clientcommands to javafx.fxml;
+    exports com.ruppyrup.bigfun.controllers;
+    opens com.ruppyrup.bigfun.controllers to javafx.fxml;
 }

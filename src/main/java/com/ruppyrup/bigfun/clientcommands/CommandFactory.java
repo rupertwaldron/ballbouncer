@@ -1,7 +1,6 @@
 package com.ruppyrup.bigfun.clientcommands;
 
-import com.ruppyrup.bigfun.ClientController;
-import com.ruppyrup.bigfun.Command;
+import com.ruppyrup.bigfun.controllers.ClientController;
 
 public class CommandFactory {
 

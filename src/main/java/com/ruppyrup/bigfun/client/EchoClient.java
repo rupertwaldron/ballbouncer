@@ -1,7 +1,7 @@
 package com.ruppyrup.bigfun.client;
 
-import com.ruppyrup.bigfun.ClientController;
-import com.ruppyrup.bigfun.Command;
+import com.ruppyrup.bigfun.controllers.ClientController;
+import com.ruppyrup.bigfun.clientcommands.Command;
 import com.ruppyrup.bigfun.clientcommands.CommandFactory;
 import com.ruppyrup.bigfun.clientcommands.EchoCommands;
 import javafx.concurrent.Service;

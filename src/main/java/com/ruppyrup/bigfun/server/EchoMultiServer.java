@@ -1,6 +1,5 @@
 package com.ruppyrup.bigfun.server;
 
-import com.ruppyrup.bigfun.client.EchoClientResult;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
@@ -19,7 +18,7 @@ import static com.ruppyrup.bigfun.clientcommands.EchoCommands.ADD_PLAYER;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.CO_ORD;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.REMOVE_PLAYER;
 
-public class EchoMultiServer extends Service<EchoClientResult>  {
+public class EchoMultiServer extends Service<EchoServerResult>  {
     private boolean enableServer = true;
     private final ExecutorService executorService;
     private Map<String, PrintWriter> clients = new HashMap<>();
@@ -29,10 +28,10 @@ public class EchoMultiServer extends Service<EchoClientResult>  {
     }
 
     @Override
-    protected Task<EchoClientResult> createTask() {
-        return new Task<>() {
+    protected Task<EchoServerResult> createTask() {
+        return new Task<EchoServerResult>() {
             @Override
-            protected EchoClientResult call() throws Exception {
+            protected EchoServerResult call() throws Exception {
                 return startServer(6666);
             }
         };
@@ -44,7 +43,7 @@ public class EchoMultiServer extends Service<EchoClientResult>  {
 //
 //    }
 
-    public EchoClientResult startServer(int port) {
+    public EchoServerResult startServer(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)){
             System.out.println("Server is running");
             while (enableServer)
@@ -53,7 +52,7 @@ public class EchoMultiServer extends Service<EchoClientResult>  {
             e.printStackTrace();
         } finally {
             System.out.println("Server stopped");
-            return EchoClientResult.SUCCESS;
+            return EchoServerResult.SUCCESS;
         }
     }
 
