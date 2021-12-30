@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -73,6 +74,10 @@ public class ClientController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         echoClient = new EchoClient(this, "127.0.0.1", 6666);
         echoClient.start();
+
+        ball = new Circle(15, Color.LIGHTCYAN);
+        ball.relocate(100, 100);
+        anchorPane.getChildren().add(ball);
 
         echoClient.setOnSucceeded(event -> {
             System.out.println("Succeeded :: " + echoClient.getValue());
@@ -146,6 +151,22 @@ public class ClientController implements Initializable {
 
         double deltaX = xValue - buttonX - 20.0;
         double deltaY = yValue - buttonY - 20.0;
+
+        transition.setToX(deltaX);
+        transition.setToY(deltaY);
+        transition.play();
+    }
+
+    public void moveBall(Double xValue, Double yValue) {
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.millis(20));
+        transition.setNode(ball);
+
+        double ballX = ball.getLayoutX();
+        double ballY = ball.getLayoutY();
+
+        double deltaX = xValue - ballX;
+        double deltaY = yValue - ballY;
 
         transition.setToX(deltaX);
         transition.setToY(deltaY);

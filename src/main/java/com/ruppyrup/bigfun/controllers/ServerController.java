@@ -28,7 +28,7 @@ public class ServerController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        echoMultiServer = new EchoMultiServer();
+        echoMultiServer = new EchoMultiServer(this);
         echoMultiServer.start();
 
         ball = new Circle(15, Color.PALEGREEN);
@@ -51,8 +51,13 @@ public class ServerController implements Initializable {
             @Override
             public void handle(ActionEvent t) {
                 //move the ball
-                ball.setLayoutX(ball.getLayoutX() + dx);
-                ball.setLayoutY(ball.getLayoutY() + dy);
+                double newXPosition = ball.getLayoutX() + dx;
+                double newYPosition = ball.getLayoutY() + dy;
+
+                echoMultiServer.sendBallPosition(newXPosition, newYPosition);
+
+                ball.setLayoutX(newXPosition);
+                ball.setLayoutY(newYPosition);
 
                 Bounds bounds = anchorPane.getLayoutBounds();
                 final boolean atRightBorder = ball.getLayoutX() >= (bounds.getMaxX() - ball.getRadius());

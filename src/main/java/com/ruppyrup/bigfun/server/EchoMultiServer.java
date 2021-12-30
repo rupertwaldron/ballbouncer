@@ -1,5 +1,6 @@
 package com.ruppyrup.bigfun.server;
 
+import com.ruppyrup.bigfun.controllers.ServerController;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
@@ -15,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.ADD_PLAYER;
+import static com.ruppyrup.bigfun.clientcommands.EchoCommands.BALL_POSITION;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.CO_ORD;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.REMOVE_PLAYER;
 
@@ -22,8 +24,10 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
     private boolean enableServer = true;
     private final ExecutorService executorService;
     private Map<String, PrintWriter> clients = new HashMap<>();
+    private final ServerController serverController;
 
-    public EchoMultiServer() {
+    public EchoMultiServer(ServerController serverController) {
+        this.serverController = serverController;
         this.executorService = Executors.newFixedThreadPool(200);
     }
 
@@ -58,6 +62,10 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
 
     public void stop() {
         enableServer = false;
+    }
+
+    public void sendBallPosition(double newXPosition, double newYPosition) {
+        clients.forEach((key, value) -> value.println(BALL_POSITION + ">" + "all" + "%" + newXPosition + ":" + newYPosition));
     }
 
     private class EchoClientHandler implements Runnable {
