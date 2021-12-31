@@ -100,6 +100,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
                 System.out.println("Client closed:: " + clientId);
                 clients.remove(clientId);
                 clients.forEach((key, value) -> value.println(REMOVE_PLAYER + ">" + clientId));
+                serverController.removePlayer(clientId);
                 try {
                     clientSocket.close();
                 } catch (IOException e) {

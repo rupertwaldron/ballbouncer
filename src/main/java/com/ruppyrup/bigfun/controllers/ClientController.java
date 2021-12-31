@@ -172,4 +172,11 @@ public class ClientController implements Initializable {
         transition.setToY(deltaY);
         transition.play();
     }
+
+    public void removePlayer(String id) {
+        Button buttonToRemove = buttons.get(id);
+        buttonToRemove.setDisable(true);
+        buttonToRemove.setVisible(false);
+        buttons.remove(id);
+    }
 }
