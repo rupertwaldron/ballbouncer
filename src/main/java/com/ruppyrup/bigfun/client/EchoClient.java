@@ -59,7 +59,7 @@ public class EchoClient extends Service<EchoClientResult> {
         } finally {
             System.out.println("Closing connection on port :: " + port);
             stopConnection();
-            System.exit(0);
+//            System.exit(0);
         }
         return EchoClientResult.SUCCESS;
     }

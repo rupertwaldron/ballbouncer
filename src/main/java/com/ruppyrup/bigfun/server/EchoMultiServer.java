@@ -83,14 +83,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-                Platform.runLater(() -> serverController.addNewPlayer(clientId));
-
-                clients.forEach((id, writer) -> {
-                    writer.println(ADD_PLAYER + ">" + clientId);
-                    out.println(ADD_PLAYER + ">" + id);
-                });
-
-                clients.put(clientId, out);
+                addNewPlayerToServerAndExistingPlayers(out);
 
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
@@ -99,13 +92,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
                         out.println("bye");
                         break;
                     }
-                    String sendMessage = CO_ORD + ">" +  clientId + "%" + inputLine;
-                    String[] xyValues = inputLine.split(":");
-                    Double xValue = Double.valueOf(xyValues[0]);
-                    Double yValue = Double.valueOf(xyValues[1]);
-                    Platform.runLater(() -> serverController.moveButton(clientId, xValue, yValue));
-                    clients.forEach((id, writer) -> writer.println(sendMessage));
-//                    out.println("[Server] " + inputLine);
+                    updateServerAndPlayersWithUpdatedPlayerLocation(inputLine);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -119,6 +106,26 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
                     e.printStackTrace();
                 }
             }
+        }
+
+        private void updateServerAndPlayersWithUpdatedPlayerLocation(String inputLine) {
+            String sendMessage = CO_ORD + ">" +  clientId + "%" + inputLine;
+            String[] xyValues = inputLine.split(":");
+            Double xValue = Double.valueOf(xyValues[0]);
+            Double yValue = Double.valueOf(xyValues[1]);
+            Platform.runLater(() -> serverController.moveButton(clientId, xValue, yValue));
+            clients.forEach((id, writer) -> writer.println(sendMessage));
+        }
+
+        private void addNewPlayerToServerAndExistingPlayers(PrintWriter out) {
+            Platform.runLater(() -> serverController.addNewPlayer(clientId));
+
+            clients.forEach((id, writer) -> {
+                writer.println(ADD_PLAYER + ">" + clientId);
+                out.println(ADD_PLAYER + ">" + id);
+            });
+
+            clients.put(clientId, out);
         }
     }
 }
