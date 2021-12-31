@@ -1,24 +1,32 @@
 package com.ruppyrup.bigfun.controllers;
 
+import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.server.EchoMultiServer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
+import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 public class ServerController implements Initializable {
 
     private EchoMultiServer echoMultiServer;
+    private Map<String, Button> players = new HashMap<>();
 
     @FXML
     private AnchorPane anchorPane;
@@ -39,6 +47,55 @@ public class ServerController implements Initializable {
         echoMultiServer.setOnSucceeded(event -> {
             System.out.println("Succeeded :: " + echoMultiServer.getValue());
         });
+    }
+
+    public void addNewPlayer(String id) {
+        System.out.println("Adding new button");
+        Random random = new Random();
+        String name = id.substring(15);
+        String color = Integer.toHexString(random.nextInt(255))
+                + Integer.toHexString(random.nextInt(255))
+                + Integer.toHexString(random.nextInt(255));
+        System.out.println("Color :: " + color);
+        JFXButton newPlayerButton = new JFXButton(name);
+        newPlayerButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
+        newPlayerButton.setMinSize(40, 40);
+        newPlayerButton.setTextFill(Paint.valueOf("#FFFFFF"));
+        newPlayerButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
+        newPlayerButton.setButtonType(JFXButton.ButtonType.RAISED);
+        newPlayerButton.setLayoutX(random.nextDouble() * 400.0);
+        newPlayerButton.setLayoutY(random.nextDouble() * 400.0);
+
+        players.put(id, newPlayerButton);
+
+        try {
+            anchorPane.getChildren().add(newPlayerButton);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println("Added player finished");
+        }
+    }
+
+    public void moveButton(String id, double xValue, double yValue) {
+
+        Button buttonToMove = players.get(id);
+
+        if (buttonToMove == null) return; // if own button or button doesn't exist
+
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.millis(300));
+        transition.setNode(buttonToMove);
+
+        double buttonX = buttonToMove.getLayoutX();
+        double buttonY = buttonToMove.getLayoutY();
+
+        double deltaX = xValue - buttonX - 20.0;
+        double deltaY = yValue - buttonY - 20.0;
+
+        transition.setToX(deltaX);
+        transition.setToY(deltaY);
+        transition.play();
     }
 
 

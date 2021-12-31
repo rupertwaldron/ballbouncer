@@ -30,13 +30,6 @@ public class EchoClient extends Service<EchoClientResult> {
         this.commandFactory = new CommandFactory(animationController);
     }
 
-//    public static void main(String[] args) {
-//        EchoClient echoClient = new EchoClient(ipAddress, port);
-//        echoClient.startConnection("127.0.0.1", 6666);
-////        String response = echoClient.sendMessage("Hello from echo client");
-////        System.out.println("Response from server -> " + response);
-//    }
-
     private EchoClientResult startConnection() {
         try {
             clientSocket = new Socket(ipAddress, port);
@@ -82,12 +75,6 @@ public class EchoClient extends Service<EchoClientResult> {
 
     public String sendMessage(String msg) {
         out.println(msg);
-//        String resp = null;
-//        try {
-//            resp = in.readLine();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         return msg;
     }
 

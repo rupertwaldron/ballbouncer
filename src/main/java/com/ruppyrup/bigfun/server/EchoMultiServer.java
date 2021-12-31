@@ -1,6 +1,7 @@
 package com.ruppyrup.bigfun.server;
 
 import com.ruppyrup.bigfun.controllers.ServerController;
+import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
@@ -65,7 +66,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
     }
 
     public void sendBallPosition(double newXPosition, double newYPosition) {
-        clients.forEach((key, value) -> value.println(BALL_POSITION + ">" + "all" + "%" + newXPosition + ":" + newYPosition));
+        clients.forEach((id, writer) -> writer.println(BALL_POSITION + ">" + "all" + "%" + newXPosition + ":" + newYPosition));
     }
 
     private class EchoClientHandler implements Runnable {
@@ -82,9 +83,11 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
             try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-                clients.forEach((key, value) -> {
-                    value.println(ADD_PLAYER + ">" + clientId);
-                    out.println(ADD_PLAYER + ">" + key);
+                Platform.runLater(() -> serverController.addNewPlayer(clientId));
+
+                clients.forEach((id, writer) -> {
+                    writer.println(ADD_PLAYER + ">" + clientId);
+                    out.println(ADD_PLAYER + ">" + id);
                 });
 
                 clients.put(clientId, out);
@@ -97,7 +100,11 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
                         break;
                     }
                     String sendMessage = CO_ORD + ">" +  clientId + "%" + inputLine;
-                    clients.forEach((key, value) -> value.println(sendMessage));
+                    String[] xyValues = inputLine.split(":");
+                    Double xValue = Double.valueOf(xyValues[0]);
+                    Double yValue = Double.valueOf(xyValues[1]);
+                    Platform.runLater(() -> serverController.moveButton(clientId, xValue, yValue));
+                    clients.forEach((id, writer) -> writer.println(sendMessage));
 //                    out.println("[Server] " + inputLine);
                 }
             } catch (IOException e) {
