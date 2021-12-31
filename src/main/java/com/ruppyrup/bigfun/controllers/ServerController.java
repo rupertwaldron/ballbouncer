@@ -77,6 +77,13 @@ public class ServerController implements Initializable {
         }
     }
 
+    public void removePlayer(String id) {
+        Button buttonToRemove = players.get(id);
+        buttonToRemove.setDisable(true);
+        buttonToRemove.setVisible(false);
+        players.remove(id);
+    }
+
     public void moveButton(String id, double xValue, double yValue) {
 
         Button buttonToMove = players.get(id);
