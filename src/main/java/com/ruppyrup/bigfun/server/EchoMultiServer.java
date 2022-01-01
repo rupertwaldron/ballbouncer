@@ -24,7 +24,7 @@ import static com.ruppyrup.bigfun.clientcommands.EchoCommands.REMOVE_PLAYER;
 public class EchoMultiServer extends Service<EchoServerResult>  {
     private boolean enableServer = true;
     private final ExecutorService executorService;
-    private Map<String, PrintWriter> clients = new HashMap<>();
+    private final Map<String, PrintWriter> clients = new HashMap<>();
     private final ServerController serverController;
 
     public EchoMultiServer(ServerController serverController) {
@@ -42,11 +42,6 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
         };
     }
 
-//    public static void main(String[] args) {
-//        EchoMultiServer server = new EchoMultiServer();
-//        server.start(6666);
-//
-//    }
 
     public EchoServerResult startServer(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)){
@@ -58,8 +53,8 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
         } finally {
             System.out.println("Server stopped");
             stop();
-            return EchoServerResult.SUCCESS;
         }
+        return EchoServerResult.SUCCESS;
     }
 
     public void stop() {

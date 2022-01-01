@@ -15,6 +15,10 @@ public class ServerApplication extends Application {
         primaryStage.setResizable(false);
         primaryStage.setTitle("Echo Server");
         primaryStage.show();
+        primaryStage.setOnCloseRequest(e -> {
+            System.out.println("Platform closed");
+            System.exit(0);
+        });
     }
 
     public static void main(String[] args) {

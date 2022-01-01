@@ -15,7 +15,6 @@ import java.net.Socket;
 
 public class EchoClient extends Service<EchoClientResult> {
     private Socket clientSocket;
-    private final ClientController animationController;
     private PrintWriter out;
     private BufferedReader in;
     private final String ipAddress;
@@ -23,11 +22,10 @@ public class EchoClient extends Service<EchoClientResult> {
     private Command command;
     private final CommandFactory commandFactory;
 
-    public EchoClient(ClientController animationController, String ipAddress, int port) {
-        this.animationController = animationController;
+    public EchoClient(ClientController clientController, String ipAddress, int port) {
         this.ipAddress = ipAddress;
         this.port = port;
-        this.commandFactory = new CommandFactory(animationController);
+        this.commandFactory = new CommandFactory(clientController);
     }
 
     private EchoClientResult startConnection() {
@@ -42,35 +40,15 @@ public class EchoClient extends Service<EchoClientResult> {
                 System.out.println(serverInput[0] + ">" + serverInput[1]);
                 command = commandFactory.getCommand(EchoCommands.valueOf(serverInput[0]), serverInput[1]);
                 command.execute();
-//                Platform.runLater(() -> animationController.addNewButton("newbutton"));
             }
-
-//            Scanner keyboard = new Scanner(System.in);
-//            System.out.print("% ");
-//            while (keyboard.hasNext()) {
-//                String next = keyboard.nextLine();
-//                if (".".equals(next)) break;
-//                String response = sendMessage(next);
-//                System.out.println("Response from server -> " + response);
-//                System.out.print("% ");
-//            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             System.out.println("Closing connection on port :: " + port);
             stopConnection();
-//            System.exit(0);
+            System.exit(0);
         }
         return EchoClientResult.SUCCESS;
-    }
-
-    public String getOtherClients() {
-        try {
-            return in.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
     }
 
     public String sendMessage(String msg) {
