@@ -134,7 +134,7 @@ public class ServerController implements Initializable {
 
 
     private void bounceBall() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), t -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), t -> {
             //move the ball
             ballPositionX = ball.getLayoutX() + dx;
             ballPositionY = ball.getLayoutY() + dy;
@@ -170,7 +170,7 @@ public class ServerController implements Initializable {
     }
 
     public void moveButton(String id, double xValue, double yValue) {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), t -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(300), t -> {
             Button buttonToMove = players.get(id);
 
             if (buttonToMove == null) return; // if own button or button doesn't exist
