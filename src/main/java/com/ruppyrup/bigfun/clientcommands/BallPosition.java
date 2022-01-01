@@ -22,6 +22,6 @@ public class BallPosition implements Command {
     @Override
     public void execute() {
         Platform.runLater(() -> animationController.moveBall(xValue, yValue));
-        System.out.println("Executed BallPosition to coordinate: " + xValue + ":" + yValue);
+//        System.out.println("Executed BallPosition to coordinate: " + xValue + ":" + yValue);
     }
 }

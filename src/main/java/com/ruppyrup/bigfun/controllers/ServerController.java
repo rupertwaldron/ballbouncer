@@ -21,15 +21,21 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.ResourceBundle;
 
 import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
 
 public class ServerController implements Initializable {
 
+    private static final int BUTTON_DIAMETER = 40;
+    private static final int BUTTON_RADIUS = BUTTON_DIAMETER / 2;
+    private static final int BALL_RADIUS = 15;
     private EchoMultiServer echoMultiServer;
-    private Map<String, Button> players = new HashMap<>();
+    private final Map<String, Button> players = new HashMap<>();
+    private double ballPositionX;
+    private double ballPositionY;
+    private double dx = 3;
+    private double dy = 3;
 
     @FXML
     private AnchorPane anchorPane;
@@ -42,7 +48,7 @@ public class ServerController implements Initializable {
         echoMultiServer = new EchoMultiServer(this);
         echoMultiServer.start();
 
-        ball = new Circle(15, Color.PALEGREEN);
+        ball = new Circle(BALL_RADIUS, Color.ORANGE);
         ball.relocate(100, 100);
         anchorPane.getChildren().add(ball);
         bounceBall();
@@ -59,7 +65,7 @@ public class ServerController implements Initializable {
         System.out.println("Color :: " + color);
         JFXButton newPlayerButton = new JFXButton(name);
         newPlayerButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
-        newPlayerButton.setMinSize(40, 40);
+        newPlayerButton.setMinSize(BUTTON_DIAMETER, BUTTON_DIAMETER);
         newPlayerButton.setTextFill(Paint.valueOf("#FFFFFF"));
         newPlayerButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
         newPlayerButton.setButtonType(JFXButton.ButtonType.RAISED);
@@ -84,60 +90,110 @@ public class ServerController implements Initializable {
         players.remove(id);
     }
 
-    public void moveButton(String id, double xValue, double yValue) {
+//    public void moveButton(String id, double xValue, double yValue) {
+//        Button buttonToMove = players.get(id);
+//
+//        if (buttonToMove == null) return; // if own button or button doesn't exist
+//
+//        TranslateTransition transition = new TranslateTransition();
+//        transition.setDuration(Duration.millis(300));
+//        transition.setNode(buttonToMove);
+//
+//        if (hasPlayerHitBall(xValue, yValue)) {
+//            System.out.println("Ball has been hit by client :: " + id);
+//            dx *= -1;
+//            dy *= -1;
+//        }
+//
+//        double buttonX = buttonToMove.getLayoutX();
+//        double buttonY = buttonToMove.getLayoutY();
+//
+//        double deltaX = xValue - buttonX - BUTTON_RADIUS;
+//        double deltaY = yValue - buttonY - BUTTON_RADIUS;
+//
+//
+//
+//        transition.setToX(deltaX);
+//        transition.setToY(deltaY);
+//        transition.play();
+//        System.out.println("Moving button to x y ::" + buttonToMove.getLayoutX() + " : " + buttonToMove.getLayoutY());
+//    }
 
-        Button buttonToMove = players.get(id);
+    private boolean hasPlayerHitBall(String id) {
+        Button button = players.get(id);
+        double xValue = button.getLayoutX();
+        double yValue = button.getLayoutY();
+        return hasPlayerHitBall(xValue, yValue);
+    }
 
-        if (buttonToMove == null) return; // if own button or button doesn't exist
-
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.millis(300));
-        transition.setNode(buttonToMove);
-
-        double buttonX = buttonToMove.getLayoutX();
-        double buttonY = buttonToMove.getLayoutY();
-
-        double deltaX = xValue - buttonX - 20.0;
-        double deltaY = yValue - buttonY - 20.0;
-
-        transition.setToX(deltaX);
-        transition.setToY(deltaY);
-        transition.play();
+    private boolean hasPlayerHitBall(double xValue, double yValue) {
+        return ballPositionX - BALL_RADIUS <= xValue + BUTTON_RADIUS && ballPositionX + BALL_RADIUS >= xValue - BUTTON_RADIUS &&
+                ballPositionY - BALL_RADIUS <= yValue + BUTTON_RADIUS && ballPositionY + BALL_RADIUS >= yValue + BUTTON_RADIUS;
     }
 
 
+
     private void bounceBall() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), new EventHandler<ActionEvent>() {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), t -> {
+            //move the ball
+            ballPositionX = ball.getLayoutX() + dx;
+            ballPositionY = ball.getLayoutY() + dy;
 
-            double dx = 3; //Step on x or velocity
-            double dy = 3; //Step on y
+            players.keySet().stream()
+                    .filter(ServerController.this::hasPlayerHitBall)
+                    .forEach(id -> {
+                        System.out.println("Client hit by ball:: " + id);
+                        dx *= -1;
+                        dy *= -1;
+                    });
 
-            @Override
-            public void handle(ActionEvent t) {
-                //move the ball
-                double newXPosition = ball.getLayoutX() + dx;
-                double newYPosition = ball.getLayoutY() + dy;
+            echoMultiServer.sendBallPosition(ballPositionX, ballPositionY);
 
-                echoMultiServer.sendBallPosition(newXPosition, newYPosition);
+            ball.setLayoutX(ballPositionX);
+            ball.setLayoutY(ballPositionY);
 
-                ball.setLayoutX(newXPosition);
-                ball.setLayoutY(newYPosition);
+            Bounds bounds = anchorPane.getLayoutBounds();
+            final boolean atRightBorder = ball.getLayoutX() >= (bounds.getMaxX() - ball.getRadius());
+            final boolean atLeftBorder = ball.getLayoutX() <= (bounds.getMinX() + ball.getRadius());
+            final boolean atBottomBorder = ball.getLayoutY() >= (bounds.getMaxY() - ball.getRadius());
+            final boolean atTopBorder = ball.getLayoutY() <= (bounds.getMinY() + ball.getRadius());
 
-                Bounds bounds = anchorPane.getLayoutBounds();
-                final boolean atRightBorder = ball.getLayoutX() >= (bounds.getMaxX() - ball.getRadius());
-                final boolean atLeftBorder = ball.getLayoutX() <= (bounds.getMinX() + ball.getRadius());
-                final boolean atBottomBorder = ball.getLayoutY() >= (bounds.getMaxY() - ball.getRadius());
-                final boolean atTopBorder = ball.getLayoutY() <= (bounds.getMinY() + ball.getRadius());
-
-                if (atRightBorder || atLeftBorder) {
-                    dx *= -1;
-                }
-                if (atBottomBorder || atTopBorder) {
-                    dy *= -1;
-                }
+            if (atRightBorder || atLeftBorder) {
+                dx *= -1;
+            }
+            if (atBottomBorder || atTopBorder) {
+                dy *= -1;
             }
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    public void moveButton(String id, double xValue, double yValue) {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), t -> {
+            Button buttonToMove = players.get(id);
+
+            if (buttonToMove == null) return; // if own button or button doesn't exist
+
+
+            if (hasPlayerHitBall(xValue, yValue)) {
+                System.out.println("Ball has been hit by client :: " + id);
+                dx *= -1;
+                dy *= -1;
+            }
+
+            double buttonX = buttonToMove.getLayoutX();
+            double buttonY = buttonToMove.getLayoutY();
+
+//            double deltaX = xValue - buttonX;
+//            double deltaY = yValue - buttonY;
+
+            buttonToMove.setLayoutX(xValue);
+            buttonToMove.setLayoutY(yValue);
+
+            System.out.println("Moving button to x y ::" + buttonToMove.getLayoutX() + " : " + buttonToMove.getLayoutY());
+        }));
+        timeline.setCycleCount(1);
         timeline.play();
     }
 }

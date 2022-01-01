@@ -27,6 +27,7 @@ import static com.ruppyrup.bigfun.utils.CommonUtil.getRandomRGBColor;
 
 public class ClientController implements Initializable {
 
+    private static final double BUTTON_RADIUS = 20.0;
     private Queue<MouseEvent> mouseEvents = new LinkedList<>();
     private EchoClient echoClient;
     private Map<String, Button> buttons = new HashMap<>();
@@ -55,7 +56,7 @@ public class ClientController implements Initializable {
     void onMouseMoved(MouseEvent event) throws InterruptedException {
         if (counter++ == 10) {
             mouseEvents.add(event);
-            echoClient.sendMessage(event.getX() + ":" + event.getY());
+            echoClient.sendMessage(event.getX()+ ":" + event.getY());
             counter = 0;
         }
         buttonTransition();
@@ -98,11 +99,13 @@ public class ClientController implements Initializable {
             double buttonX = button.getLayoutX();
             double buttonY = button.getLayoutY();
 
+            System.out.println("Buttonlayout x = " + buttonX);
+
             double mouseX = event.getX();
             double mouseY = event.getY();
 
-            double deltaX = mouseX - buttonX - 20.0;
-            double deltaY = mouseY - buttonY - 20.0;
+            double deltaX = mouseX - buttonX;
+            double deltaY = mouseY - buttonY;
 
             transition.setToX(deltaX);
             transition.setToY(deltaY);
@@ -148,8 +151,8 @@ public class ClientController implements Initializable {
         double buttonX = buttonToMove.getLayoutX();
         double buttonY = buttonToMove.getLayoutY();
 
-        double deltaX = xValue - buttonX - 20.0;
-        double deltaY = yValue - buttonY - 20.0;
+        double deltaX = xValue - buttonX;
+        double deltaY = yValue - buttonY;
 
         transition.setToX(deltaX);
         transition.setToY(deltaY);

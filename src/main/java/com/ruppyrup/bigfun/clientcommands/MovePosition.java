@@ -22,6 +22,6 @@ public class MovePosition implements Command {
     @Override
     public void execute() {
         Platform.runLater(() -> animationController.moveButton(id, xValue, yValue));
-        System.out.println("Executed MovePosition to coordinate: " + xValue + ":" + yValue);
+//        System.out.println("Executed MovePosition to coordinate: " + xValue + ":" + yValue);
     }
 }
