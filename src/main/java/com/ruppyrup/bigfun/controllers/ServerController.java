@@ -2,6 +2,7 @@ package com.ruppyrup.bigfun.controllers;
 
 import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.server.EchoMultiServer;
+import com.ruppyrup.bigfun.utils.CommonUtil;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
+
+import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
 
 public class ServerController implements Initializable {
 
@@ -51,11 +54,8 @@ public class ServerController implements Initializable {
 
     public void addNewPlayer(String id) {
         System.out.println("Adding new button");
-        Random random = new Random();
         String name = id.substring(15);
-        String color = Integer.toHexString(random.nextInt(255))
-                + Integer.toHexString(random.nextInt(255))
-                + Integer.toHexString(random.nextInt(255));
+        String color = CommonUtil.getRandomRGBColor();
         System.out.println("Color :: " + color);
         JFXButton newPlayerButton = new JFXButton(name);
         newPlayerButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
@@ -63,8 +63,8 @@ public class ServerController implements Initializable {
         newPlayerButton.setTextFill(Paint.valueOf("#FFFFFF"));
         newPlayerButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
         newPlayerButton.setButtonType(JFXButton.ButtonType.RAISED);
-        newPlayerButton.setLayoutX(random.nextDouble() * 400.0);
-        newPlayerButton.setLayoutY(random.nextDouble() * 400.0);
+        newPlayerButton.setLayoutX(getRandom().nextDouble() * 400.0);
+        newPlayerButton.setLayoutY(getRandom().nextDouble() * 400.0);
 
         players.put(id, newPlayerButton);
 

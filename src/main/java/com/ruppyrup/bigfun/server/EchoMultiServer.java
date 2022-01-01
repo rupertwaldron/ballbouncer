@@ -29,7 +29,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
 
     public EchoMultiServer(ServerController serverController) {
         this.serverController = serverController;
-        this.executorService = Executors.newFixedThreadPool(200);
+        this.executorService = Executors.newFixedThreadPool(20);
     }
 
     @Override
@@ -57,6 +57,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
             e.printStackTrace();
         } finally {
             System.out.println("Server stopped");
+            stop();
             return EchoServerResult.SUCCESS;
         }
     }

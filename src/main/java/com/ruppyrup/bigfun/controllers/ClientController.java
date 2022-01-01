@@ -20,8 +20,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Random;
 import java.util.ResourceBundle;
+
+import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
+import static com.ruppyrup.bigfun.utils.CommonUtil.getRandomRGBColor;
 
 public class ClientController implements Initializable {
 
@@ -110,11 +112,8 @@ public class ClientController implements Initializable {
 
     public void addNewButton(String id) {
         System.out.println("Adding new button");
-        Random random = new Random();
         String name = id.substring(15);
-        String color = Integer.toHexString(random.nextInt(255))
-                + Integer.toHexString(random.nextInt(255))
-                + Integer.toHexString(random.nextInt(255));
+        String color = getRandomRGBColor();
         System.out.println("Color :: " + color);
         JFXButton friendButton = new JFXButton(name);
         friendButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
@@ -122,8 +121,8 @@ public class ClientController implements Initializable {
         friendButton.setTextFill(Paint.valueOf("#FFFFFF"));
         friendButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
         friendButton.setButtonType(JFXButton.ButtonType.RAISED);
-        friendButton.setLayoutX(random.nextDouble() * 400.0);
-        friendButton.setLayoutY(random.nextDouble() * 400.0);
+        friendButton.setLayoutX(getRandom().nextDouble() * 400.0);
+        friendButton.setLayoutY(getRandom().nextDouble() * 400.0);
 
         buttons.put(id, friendButton);
 
