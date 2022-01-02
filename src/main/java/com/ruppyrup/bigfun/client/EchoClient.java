@@ -14,12 +14,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class EchoClient extends Service<EchoClientResult> {
-    private Socket clientSocket;
+    private boolean connected = true;
     private PrintWriter out;
-    private BufferedReader in;
     private final String ipAddress;
     private final int port;
-    private Command command;
     private final CommandFactory commandFactory;
 
     public EchoClient(ClientController clientController, String ipAddress, int port) {
@@ -29,16 +27,15 @@ public class EchoClient extends Service<EchoClientResult> {
     }
 
     private EchoClientResult startConnection() {
-        try {
-            clientSocket = new Socket(ipAddress, port);
+        try(Socket clientSocket = new Socket(ipAddress, port);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+
             out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-
-            while(true) {
+            while(connected) {
                 String[] serverInput = in.readLine().split(">");
                 System.out.println(serverInput[0] + ">" + serverInput[1]);
-                command = commandFactory.getCommand(EchoCommands.valueOf(serverInput[0]), serverInput[1]);
+                Command command = commandFactory.getCommand(EchoCommands.valueOf(serverInput[0]), serverInput[1]);
                 command.execute();
             }
         } catch (IOException e) {
@@ -57,12 +54,7 @@ public class EchoClient extends Service<EchoClientResult> {
     }
 
     public void stopConnection() {
-        try {
-            in.close();
-            clientSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        connected = false;
         out.close();
     }
 

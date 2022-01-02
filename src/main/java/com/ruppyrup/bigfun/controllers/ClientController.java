@@ -2,10 +2,13 @@ package com.ruppyrup.bigfun.controllers;
 
 import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.client.EchoClient;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -26,8 +29,6 @@ import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
 import static com.ruppyrup.bigfun.utils.CommonUtil.getRandomRGBColor;
 
 public class ClientController implements Initializable {
-
-    private static final double BUTTON_RADIUS = 20.0;
     private Queue<MouseEvent> mouseEvents = new LinkedList<>();
     private EchoClient echoClient;
     private Map<String, Button> buttons = new HashMap<>();
@@ -54,7 +55,7 @@ public class ClientController implements Initializable {
 
     @FXML
     void onMouseMoved(MouseEvent event) throws InterruptedException {
-        if (counter++ == 10) {
+        if (counter++ == 2) {
             mouseEvents.add(event);
             echoClient.sendMessage(event.getX()+ ":" + event.getY());
             counter = 0;
@@ -65,12 +66,6 @@ public class ClientController implements Initializable {
     @FXML
     void onMousePressed(MouseEvent event) {
 //        mouseEvents.add(event);
-        String serverResponse = echoClient.sendMessage(event.getX() + ":" + event.getY());
-        System.out.println(serverResponse);
-        buttonTransition();
-
-        System.out.println("X Value :: " + event.getX());
-        System.out.println("Y Value :: " + event.getY());
     }
 
     @Override
@@ -82,34 +77,15 @@ public class ClientController implements Initializable {
         ball.relocate(100, 100);
         anchorPane.getChildren().add(ball);
 
-        echoClient.setOnSucceeded(event -> {
-            System.out.println("Succeeded :: " + echoClient.getValue());
-        });
+        echoClient.setOnSucceeded(event -> System.out.println("Succeeded :: " + echoClient.getValue()));
     }
 
+
+
     private void buttonTransition() {
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.millis(300));
-        transition.setNode(button);
-
         while (!mouseEvents.isEmpty()) {
-
             MouseEvent event = mouseEvents.remove();
-
-            double buttonX = button.getLayoutX();
-            double buttonY = button.getLayoutY();
-
-            System.out.println("Buttonlayout x = " + buttonX);
-
-            double mouseX = event.getX();
-            double mouseY = event.getY();
-
-            double deltaX = mouseX - buttonX;
-            double deltaY = mouseY - buttonY;
-
-            transition.setToX(deltaX);
-            transition.setToY(deltaY);
-            transition.play();
+            transitionNode(button, event.getX(), event.getY(), 150);
         }
     }
 
@@ -139,40 +115,23 @@ public class ClientController implements Initializable {
     }
 
     public void moveButton(String id, double xValue, double yValue) {
-
         Button buttonToMove = buttons.get(id);
-
         if (buttonToMove == null) return; // if own button or button doesn't exist
-
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.millis(300));
-        transition.setNode(buttonToMove);
-
-        double buttonX = buttonToMove.getLayoutX();
-        double buttonY = buttonToMove.getLayoutY();
-
-        double deltaX = xValue - buttonX;
-        double deltaY = yValue - buttonY;
-
-        transition.setToX(deltaX);
-        transition.setToY(deltaY);
-        transition.play();
+        transitionNode(buttonToMove, xValue, yValue, 150);
     }
 
+
     public void moveBall(Double xValue, Double yValue) {
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.millis(20));
-        transition.setNode(ball);
+        transitionNode(ball, xValue, yValue, 20);
+    }
 
-        double ballX = ball.getLayoutX();
-        double ballY = ball.getLayoutY();
-
-        double deltaX = xValue - ballX;
-        double deltaY = yValue - ballY;
-
-        transition.setToX(deltaX);
-        transition.setToY(deltaY);
-        transition.play();
+    private void transitionNode(Node nodeToMove, double xValue, double yValue, int duration) {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(duration), t -> {
+            nodeToMove.setLayoutX(xValue);
+            nodeToMove.setLayoutY(yValue);
+        }));
+        timeline.setCycleCount(1);
+        timeline.play();
     }
 
     public void removePlayer(String id) {

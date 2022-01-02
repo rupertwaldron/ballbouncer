@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import static com.ruppyrup.bigfun.constants.BallConstants.BALL_RADIUS;
+import static com.ruppyrup.bigfun.constants.BallConstants.BUTTON_DIAMETER;
+import static com.ruppyrup.bigfun.constants.BallConstants.BUTTON_RADIUS;
 import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
 
 public class ServerController implements Initializable {
 
-    private static final int BUTTON_DIAMETER = 40;
-    private static final int BUTTON_RADIUS = BUTTON_DIAMETER / 2;
-    private static final int BALL_RADIUS = 15;
     private EchoMultiServer echoMultiServer;
     private final Map<String, Button> players = new HashMap<>();
     private double ballPositionX;
@@ -90,35 +90,6 @@ public class ServerController implements Initializable {
         players.remove(id);
     }
 
-//    public void moveButton(String id, double xValue, double yValue) {
-//        Button buttonToMove = players.get(id);
-//
-//        if (buttonToMove == null) return; // if own button or button doesn't exist
-//
-//        TranslateTransition transition = new TranslateTransition();
-//        transition.setDuration(Duration.millis(300));
-//        transition.setNode(buttonToMove);
-//
-//        if (hasPlayerHitBall(xValue, yValue)) {
-//            System.out.println("Ball has been hit by client :: " + id);
-//            dx *= -1;
-//            dy *= -1;
-//        }
-//
-//        double buttonX = buttonToMove.getLayoutX();
-//        double buttonY = buttonToMove.getLayoutY();
-//
-//        double deltaX = xValue - buttonX - BUTTON_RADIUS;
-//        double deltaY = yValue - buttonY - BUTTON_RADIUS;
-//
-//
-//
-//        transition.setToX(deltaX);
-//        transition.setToY(deltaY);
-//        transition.play();
-//        System.out.println("Moving button to x y ::" + buttonToMove.getLayoutX() + " : " + buttonToMove.getLayoutY());
-//    }
-
     private boolean hasPlayerHitBall(String id) {
         Button button = players.get(id);
         double xValue = button.getLayoutX();
@@ -170,7 +141,7 @@ public class ServerController implements Initializable {
     }
 
     public void moveButton(String id, double xValue, double yValue) {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(300), t -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(150), t -> {
             Button buttonToMove = players.get(id);
 
             if (buttonToMove == null) return; // if own button or button doesn't exist
@@ -181,12 +152,6 @@ public class ServerController implements Initializable {
                 dx *= -1;
                 dy *= -1;
             }
-
-            double buttonX = buttonToMove.getLayoutX();
-            double buttonY = buttonToMove.getLayoutY();
-
-//            double deltaX = xValue - buttonX;
-//            double deltaY = yValue - buttonY;
 
             buttonToMove.setLayoutX(xValue);
             buttonToMove.setLayoutY(yValue);
