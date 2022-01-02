@@ -110,7 +110,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
             String[] xyValues = inputLine.split(":");
             Double xValue = Double.valueOf(xyValues[0]);
             Double yValue = Double.valueOf(xyValues[1]);
-            Platform.runLater(() -> serverController.moveButton(clientId, xValue, yValue));
+            Platform.runLater(() -> serverController.moveOtherPlayer(clientId, xValue, yValue));
             clients.forEach((id, writer) -> writer.println(sendMessage));
         }
 

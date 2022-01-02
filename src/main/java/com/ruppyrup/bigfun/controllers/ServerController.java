@@ -1,8 +1,7 @@
 package com.ruppyrup.bigfun.controllers;
 
-import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.server.EchoMultiServer;
-import com.ruppyrup.bigfun.utils.CommonUtil;
+import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -10,9 +9,11 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -21,14 +22,14 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import static com.ruppyrup.bigfun.constants.BallConstants.BALL_RADIUS;
-import static com.ruppyrup.bigfun.constants.BallConstants.PLAYER_DIAMETER;
 import static com.ruppyrup.bigfun.constants.BallConstants.PLAYER_RADIUS;
 import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
+import static com.ruppyrup.bigfun.utils.CommonUtil.getRandomRGBColor;
 
 public class ServerController implements Initializable {
 
     private EchoMultiServer echoMultiServer;
-    private final Map<String, Button> players = new HashMap<>();
+    private final Map<String, Circle> players = new HashMap<>();
     private double ballPositionX;
     private double ballPositionY;
     private double dx = 3;
@@ -45,54 +46,37 @@ public class ServerController implements Initializable {
         echoMultiServer = new EchoMultiServer(this);
         echoMultiServer.start();
 
-        ball = new Circle(BALL_RADIUS, Color.ORANGE);
-//        ball.relocate(100, 100);
-        ball.setCenterX(100);
-        ball.setCenterY(100);
-        anchorPane.getChildren().add(ball);
+        ball = createCircle(BALL_RADIUS, Color.ORANGE, new Position(100, 100));
         bounceBall();
 
-        echoMultiServer.setOnSucceeded(event -> {
-            System.out.println("Succeeded :: " + echoMultiServer.getValue());
-        });
+        echoMultiServer.setOnSucceeded(event -> System.out.println("Succeeded :: " + echoMultiServer.getValue()));
     }
 
     public void addNewPlayer(String id) {
         System.out.println("Adding new button");
-        String name = id.substring(15);
-        String color = CommonUtil.getRandomRGBColor();
+        Text name = new Text(id.substring(15));
+        String color = getRandomRGBColor();
         System.out.println("Color :: " + color);
-        JFXButton newPlayerButton = new JFXButton(name);
-        newPlayerButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
-        newPlayerButton.setMinSize(PLAYER_DIAMETER, PLAYER_DIAMETER);
-        newPlayerButton.setTextFill(Paint.valueOf("#FFFFFF"));
-        newPlayerButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
-        newPlayerButton.setButtonType(JFXButton.ButtonType.RAISED);
-        newPlayerButton.setLayoutX(getRandom().nextDouble() * 400.0);
-        newPlayerButton.setLayoutY(getRandom().nextDouble() * 400.0);
+        Circle newPlayer = createCircle(PLAYER_RADIUS,
+                Color.valueOf(color),
+                new Position(
+                        getRandom().nextDouble() * 400.0,
+                        getRandom().nextDouble() * 400.0));
 
-        players.put(id, newPlayerButton);
-
-        try {
-            anchorPane.getChildren().add(newPlayerButton);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            System.out.println("Added player finished");
-        }
+        players.put(id, newPlayer);
     }
 
     public void removePlayer(String id) {
-        Button buttonToRemove = players.get(id);
-        buttonToRemove.setDisable(true);
-        buttonToRemove.setVisible(false);
+        Circle playerToRemove = players.get(id);
+        playerToRemove.setDisable(true);
+        playerToRemove.setVisible(false);
         players.remove(id);
     }
 
     private boolean hasPlayerHitBall(String id) {
-        Button button = players.get(id);
-        double xValue = button.getLayoutX();
-        double yValue = button.getLayoutY();
+        Circle player = players.get(id);
+        double xValue = player.getCenterX();
+        double yValue = player.getCenterY();
         return hasPlayerHitBall(xValue, yValue);
     }
 
@@ -100,8 +84,6 @@ public class ServerController implements Initializable {
         return ballPositionX - BALL_RADIUS <= xValue + PLAYER_RADIUS && ballPositionX + BALL_RADIUS >= xValue - PLAYER_RADIUS &&
                 ballPositionY - BALL_RADIUS <= yValue + PLAYER_RADIUS && ballPositionY + BALL_RADIUS >= yValue + PLAYER_RADIUS;
     }
-
-
 
     private void bounceBall() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), t -> {
@@ -139,25 +121,35 @@ public class ServerController implements Initializable {
         timeline.play();
     }
 
-    public void moveButton(String id, double xValue, double yValue) {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(150), t -> {
-            Button buttonToMove = players.get(id);
+    public void moveOtherPlayer(String id, double xValue, double yValue) {
+        Circle playerToMove = players.get(id);
+        if (playerToMove == null) return;
 
-            if (buttonToMove == null) return; // if own button or button doesn't exist
+        if (hasPlayerHitBall(xValue, yValue)) {
+            System.out.println("Ball has been hit by client :: " + id);
+            dx *= -1;
+            dy *= -1;
+        }
+        transitionNode(playerToMove, xValue, yValue, 150);
+    }
 
-
-            if (hasPlayerHitBall(xValue, yValue)) {
-                System.out.println("Ball has been hit by client :: " + id);
-                dx *= -1;
-                dy *= -1;
-            }
-
-            buttonToMove.setLayoutX(xValue);
-            buttonToMove.setLayoutY(yValue);
-
-            System.out.println("Moving button to x y ::" + buttonToMove.getLayoutX() + " : " + buttonToMove.getLayoutY());
+    private void transitionNode(Circle nodeToMove, double xValue, double yValue, int duration) {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(duration), t -> {
+            nodeToMove.setCenterX(xValue);
+            nodeToMove.setCenterY(yValue);
         }));
         timeline.setCycleCount(1);
         timeline.play();
+    }
+
+    private Circle createCircle(int radius, Paint color, Position startPosition) {
+        Circle circle = new Circle(radius, color);
+        circle.setCenterX(startPosition.getX());
+        circle.setCenterY(startPosition.getY());
+        Text text = new Text("42");
+//        StackPane stack = new StackPane();
+//        stack.getChildren().addAll(circle, text);
+        anchorPane.getChildren().add(circle);
+        return circle;
     }
 }

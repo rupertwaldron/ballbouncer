@@ -16,6 +16,6 @@ public class AddPlayer implements Command {
     @Override
     public void execute() {
         System.out.println("Executed add button");
-        Platform.runLater(() -> animationController.addNewButton(id));
+        Platform.runLater(() -> animationController.addNewPlayer(id));
     }
 }

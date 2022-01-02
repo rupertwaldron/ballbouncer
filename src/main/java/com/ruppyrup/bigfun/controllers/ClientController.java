@@ -1,14 +1,11 @@
 package com.ruppyrup.bigfun.controllers;
 
-import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.client.EchoClient;
 import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -88,7 +85,7 @@ public class ClientController implements Initializable {
         }
     }
 
-    public void addNewButton(String id) {
+    public void addNewPlayer(String id) {
         System.out.println("Adding new button");
         String name = id.substring(15);
         String color = getRandomRGBColor();
@@ -102,12 +99,11 @@ public class ClientController implements Initializable {
         players.put(id, newPlayer);
     }
 
-    public void moveButton(String id, double xValue, double yValue) {
+    public void moveOtherPlayer(String id, double xValue, double yValue) {
         Circle playerToMove = players.get(id);
         if (playerToMove == null) return; // if own button or button doesn't exist
         transitionNode(playerToMove, xValue, yValue, 150);
     }
-
 
     public void moveBall(Double xValue, Double yValue) {
         transitionNode(ball, xValue, yValue, 20);
