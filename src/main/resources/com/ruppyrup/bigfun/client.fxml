@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -17,9 +16,6 @@
             <Insets />
          </StackPane.margin>
       </ImageView>
-      <AnchorPane fx:id="anchorPane" onMouseMoved="#onMouseMoved" onMousePressed="#onMousePressed" prefHeight="200.0" prefWidth="200.0">
-         <children>
-            <JFXButton fx:id="button" layoutX="273.0" layoutY="285.0" onAction="#onbuttonPressed" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #ff0000; -fx-background-radius: 2000; -fx-text-fill: #ffffff;" text="Me" />
-         </children></AnchorPane>
+      <AnchorPane fx:id="anchorPane" onMouseMoved="#onMouseMoved" onMousePressed="#onMousePressed" prefHeight="200.0" prefWidth="200.0" />
    </children>
 </StackPane>

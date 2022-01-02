@@ -2,10 +2,9 @@ package com.ruppyrup.bigfun.controllers;
 
 import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.client.EchoClient;
+import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -25,18 +24,17 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.ResourceBundle;
 
+import static com.ruppyrup.bigfun.constants.BallConstants.BALL_RADIUS;
+import static com.ruppyrup.bigfun.constants.BallConstants.PLAYER_RADIUS;
 import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
 import static com.ruppyrup.bigfun.utils.CommonUtil.getRandomRGBColor;
 
 public class ClientController implements Initializable {
-    private Queue<MouseEvent> mouseEvents = new LinkedList<>();
+    private Queue<Position> mouseEvents = new LinkedList<>();
     private EchoClient echoClient;
-    private Map<String, Button> buttons = new HashMap<>();
+    private Map<String, Circle> players = new HashMap<>();
 
     private int counter;
-
-    @FXML
-    private JFXButton button;
 
     @FXML
     private ImageView image;
@@ -45,19 +43,15 @@ public class ClientController implements Initializable {
     private AnchorPane anchorPane;
 
     private Circle ball;
-
-
-    @FXML
-    void onbuttonPressed(ActionEvent event) {
-
-//        bounceBall();
-    }
+    private Circle myPlayer;
 
     @FXML
-    void onMouseMoved(MouseEvent event) throws InterruptedException {
+    void onMouseMoved(MouseEvent event) {
         if (counter++ == 2) {
-            mouseEvents.add(event);
-            echoClient.sendMessage(event.getX()+ ":" + event.getY());
+            double adjustedX = event.getX();
+            double adjustedY = event.getY();
+            mouseEvents.add(new Position(adjustedX, adjustedY));
+            echoClient.sendMessage(adjustedX + ":" + adjustedY);
             counter = 0;
         }
         buttonTransition();
@@ -73,19 +67,24 @@ public class ClientController implements Initializable {
         echoClient = new EchoClient(this, "127.0.0.1", 6666);
         echoClient.start();
 
-        ball = new Circle(15, Color.LIGHTCYAN);
-        ball.relocate(100, 100);
-        anchorPane.getChildren().add(ball);
+        myPlayer = createCircle(PLAYER_RADIUS, Color.RED, new Position(200, 200));
+        ball = createCircle(BALL_RADIUS, Color.ORANGE, new Position(100, 100));
 
         echoClient.setOnSucceeded(event -> System.out.println("Succeeded :: " + echoClient.getValue()));
     }
 
-
+    private Circle createCircle(int radius, Paint color, Position startPosition) {
+        Circle circle = new Circle(radius, color);
+        circle.setCenterX(startPosition.getX());
+        circle.setCenterY(startPosition.getY());
+        anchorPane.getChildren().add(circle);
+        return circle;
+    }
 
     private void buttonTransition() {
         while (!mouseEvents.isEmpty()) {
-            MouseEvent event = mouseEvents.remove();
-            transitionNode(button, event.getX(), event.getY(), 150);
+            Position position = mouseEvents.remove();
+            transitionNode(myPlayer, position.getX(), position.getY(), 150);
         }
     }
 
@@ -94,30 +93,19 @@ public class ClientController implements Initializable {
         String name = id.substring(15);
         String color = getRandomRGBColor();
         System.out.println("Color :: " + color);
-        JFXButton friendButton = new JFXButton(name);
-        friendButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
-        friendButton.setMinSize(40, 40);
-        friendButton.setTextFill(Paint.valueOf("#FFFFFF"));
-        friendButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
-        friendButton.setButtonType(JFXButton.ButtonType.RAISED);
-        friendButton.setLayoutX(getRandom().nextDouble() * 400.0);
-        friendButton.setLayoutY(getRandom().nextDouble() * 400.0);
+        Circle newPlayer = createCircle(PLAYER_RADIUS,
+                Color.valueOf(color),
+                new Position(
+                        getRandom().nextDouble() * 400.0,
+                        getRandom().nextDouble() * 400.0));
 
-        buttons.put(id, friendButton);
-
-        try {
-            anchorPane.getChildren().add(friendButton);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            System.out.println("Added button finished");
-        }
+        players.put(id, newPlayer);
     }
 
     public void moveButton(String id, double xValue, double yValue) {
-        Button buttonToMove = buttons.get(id);
-        if (buttonToMove == null) return; // if own button or button doesn't exist
-        transitionNode(buttonToMove, xValue, yValue, 150);
+        Circle playerToMove = players.get(id);
+        if (playerToMove == null) return; // if own button or button doesn't exist
+        transitionNode(playerToMove, xValue, yValue, 150);
     }
 
 
@@ -125,19 +113,19 @@ public class ClientController implements Initializable {
         transitionNode(ball, xValue, yValue, 20);
     }
 
-    private void transitionNode(Node nodeToMove, double xValue, double yValue, int duration) {
+    private void transitionNode(Circle nodeToMove, double xValue, double yValue, int duration) {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(duration), t -> {
-            nodeToMove.setLayoutX(xValue);
-            nodeToMove.setLayoutY(yValue);
+            nodeToMove.setCenterX(xValue);
+            nodeToMove.setCenterY(yValue);
         }));
         timeline.setCycleCount(1);
         timeline.play();
     }
 
     public void removePlayer(String id) {
-        Button buttonToRemove = buttons.get(id);
-        buttonToRemove.setDisable(true);
-        buttonToRemove.setVisible(false);
-        buttons.remove(id);
+        Circle playerToRemove = players.get(id);
+        playerToRemove.setDisable(true);
+        playerToRemove.setVisible(false);
+        players.remove(id);
     }
 }

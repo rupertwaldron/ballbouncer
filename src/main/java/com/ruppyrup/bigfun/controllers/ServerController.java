@@ -5,9 +5,6 @@ import com.ruppyrup.bigfun.server.EchoMultiServer;
 import com.ruppyrup.bigfun.utils.CommonUtil;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -24,8 +21,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import static com.ruppyrup.bigfun.constants.BallConstants.BALL_RADIUS;
-import static com.ruppyrup.bigfun.constants.BallConstants.BUTTON_DIAMETER;
-import static com.ruppyrup.bigfun.constants.BallConstants.BUTTON_RADIUS;
+import static com.ruppyrup.bigfun.constants.BallConstants.PLAYER_DIAMETER;
+import static com.ruppyrup.bigfun.constants.BallConstants.PLAYER_RADIUS;
 import static com.ruppyrup.bigfun.utils.CommonUtil.getRandom;
 
 public class ServerController implements Initializable {
@@ -49,7 +46,9 @@ public class ServerController implements Initializable {
         echoMultiServer.start();
 
         ball = new Circle(BALL_RADIUS, Color.ORANGE);
-        ball.relocate(100, 100);
+//        ball.relocate(100, 100);
+        ball.setCenterX(100);
+        ball.setCenterY(100);
         anchorPane.getChildren().add(ball);
         bounceBall();
 
@@ -65,7 +64,7 @@ public class ServerController implements Initializable {
         System.out.println("Color :: " + color);
         JFXButton newPlayerButton = new JFXButton(name);
         newPlayerButton.setStyle("-fx-background-color: #" + color +";-fx-background-radius: 2000");
-        newPlayerButton.setMinSize(BUTTON_DIAMETER, BUTTON_DIAMETER);
+        newPlayerButton.setMinSize(PLAYER_DIAMETER, PLAYER_DIAMETER);
         newPlayerButton.setTextFill(Paint.valueOf("#FFFFFF"));
         newPlayerButton.setRipplerFill(Paint.valueOf("#FFFFFF"));
         newPlayerButton.setButtonType(JFXButton.ButtonType.RAISED);
@@ -98,8 +97,8 @@ public class ServerController implements Initializable {
     }
 
     private boolean hasPlayerHitBall(double xValue, double yValue) {
-        return ballPositionX - BALL_RADIUS <= xValue + BUTTON_RADIUS && ballPositionX + BALL_RADIUS >= xValue - BUTTON_RADIUS &&
-                ballPositionY - BALL_RADIUS <= yValue + BUTTON_RADIUS && ballPositionY + BALL_RADIUS >= yValue + BUTTON_RADIUS;
+        return ballPositionX - BALL_RADIUS <= xValue + PLAYER_RADIUS && ballPositionX + BALL_RADIUS >= xValue - PLAYER_RADIUS &&
+                ballPositionY - BALL_RADIUS <= yValue + PLAYER_RADIUS && ballPositionY + BALL_RADIUS >= yValue + PLAYER_RADIUS;
     }
 
 
@@ -107,8 +106,8 @@ public class ServerController implements Initializable {
     private void bounceBall() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), t -> {
             //move the ball
-            ballPositionX = ball.getLayoutX() + dx;
-            ballPositionY = ball.getLayoutY() + dy;
+            ballPositionX = ball.getCenterX() + dx;
+            ballPositionY = ball.getCenterY() + dy;
 
             players.keySet().stream()
                     .filter(ServerController.this::hasPlayerHitBall)
@@ -120,14 +119,14 @@ public class ServerController implements Initializable {
 
             echoMultiServer.sendBallPosition(ballPositionX, ballPositionY);
 
-            ball.setLayoutX(ballPositionX);
-            ball.setLayoutY(ballPositionY);
+            ball.setCenterX(ballPositionX);
+            ball.setCenterY(ballPositionY);
 
             Bounds bounds = anchorPane.getLayoutBounds();
-            final boolean atRightBorder = ball.getLayoutX() >= (bounds.getMaxX() - ball.getRadius());
-            final boolean atLeftBorder = ball.getLayoutX() <= (bounds.getMinX() + ball.getRadius());
-            final boolean atBottomBorder = ball.getLayoutY() >= (bounds.getMaxY() - ball.getRadius());
-            final boolean atTopBorder = ball.getLayoutY() <= (bounds.getMinY() + ball.getRadius());
+            final boolean atRightBorder = ball.getCenterX() >= (bounds.getMaxX() - ball.getRadius());
+            final boolean atLeftBorder = ball.getCenterX() <= (bounds.getMinX() + ball.getRadius());
+            final boolean atBottomBorder = ball.getCenterY() >= (bounds.getMaxY() - ball.getRadius());
+            final boolean atTopBorder = ball.getCenterY() <= (bounds.getMinY() + ball.getRadius());
 
             if (atRightBorder || atLeftBorder) {
                 dx *= -1;
