@@ -1,6 +1,7 @@
 package com.ruppyrup.bigfun.controllers;
 
 import com.ruppyrup.bigfun.client.EchoClient;
+import com.ruppyrup.bigfun.common.Player;
 import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -29,7 +30,7 @@ import static com.ruppyrup.bigfun.utils.CommonUtil.getRandomRGBColor;
 public class ClientController implements Initializable {
     private Queue<Position> mouseEvents = new LinkedList<>();
     private EchoClient echoClient;
-    private Map<String, Circle> players = new HashMap<>();
+    private Map<String, Player> players = new HashMap<>();
 
     private int counter;
 
@@ -96,11 +97,11 @@ public class ClientController implements Initializable {
                         getRandom().nextDouble() * 400.0,
                         getRandom().nextDouble() * 400.0));
 
-        players.put(id, newPlayer);
+        players.put(id, new Player(id, newPlayer));
     }
 
     public void moveOtherPlayer(String id, double xValue, double yValue) {
-        Circle playerToMove = players.get(id);
+        Circle playerToMove = players.get(id).getCircle();
         if (playerToMove == null) return; // if own button or button doesn't exist
         transitionNode(playerToMove, xValue, yValue, 150);
     }
@@ -119,7 +120,7 @@ public class ClientController implements Initializable {
     }
 
     public void removePlayer(String id) {
-        Circle playerToRemove = players.get(id);
+        Circle playerToRemove = players.get(id).getCircle();
         playerToRemove.setDisable(true);
         playerToRemove.setVisible(false);
         players.remove(id);

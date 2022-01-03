@@ -1,5 +1,6 @@
 package com.ruppyrup.bigfun.controllers;
 
+import com.ruppyrup.bigfun.common.Player;
 import com.ruppyrup.bigfun.server.EchoMultiServer;
 import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
@@ -29,7 +30,7 @@ import static com.ruppyrup.bigfun.utils.CommonUtil.getRandomRGBColor;
 public class ServerController implements Initializable {
 
     private EchoMultiServer echoMultiServer;
-    private final Map<String, Circle> players = new HashMap<>();
+    private final Map<String, Player> players = new HashMap<>();
     private double ballPositionX;
     private double ballPositionY;
     private double dx = 3;
@@ -63,29 +64,22 @@ public class ServerController implements Initializable {
                         getRandom().nextDouble() * 400.0,
                         getRandom().nextDouble() * 400.0));
 
-        players.put(id, newPlayer);
+        players.put(id, new Player(id, newPlayer));
     }
 
     public void removePlayer(String id) {
-        Circle playerToRemove = players.get(id);
+        Circle playerToRemove = players.get(id).getCircle();
         playerToRemove.setDisable(true);
         playerToRemove.setVisible(false);
         players.remove(id);
     }
 
     private boolean hasPlayerHitBall(String id) {
-        Circle player = players.get(id);
+
+        Circle player = players.get(id).getCircle();
         double xValue = player.getCenterX();
         double yValue = player.getCenterY();
-        return collisionDetection(xValue, yValue);
-    }
 
-    private boolean hasPlayerHitBall(double xValue, double yValue) {
-        return ballPositionX - BALL_RADIUS <= xValue + PLAYER_RADIUS && ballPositionX + BALL_RADIUS >= xValue - PLAYER_RADIUS &&
-                ballPositionY - BALL_RADIUS <= yValue + PLAYER_RADIUS && ballPositionY + BALL_RADIUS >= yValue + PLAYER_RADIUS;
-    }
-
-    private boolean collisionDetection(double xValue, double yValue) {
         int firstCollisionMargin = 10;
 
         boolean theBallAndPlayerCloseEnoughToCollide =
@@ -109,14 +103,20 @@ public class ServerController implements Initializable {
             double py1 = yValue + PLAYER_RADIUS * Math.sin(radians + Math.PI);
 
             boolean firstTest = Math.abs(bx1 - px1) <= closeCollisionMargin && Math.abs(by1 - py1) <= closeCollisionMargin;
-            if (firstTest) return true;
+            if (firstTest) {
+                players.get(id).hasJustHitBall();
+                return true;
+            }
 
             double bx2 = ballPositionX + BALL_RADIUS * Math.cos(radians + Math.PI);
             double px2 = xValue + PLAYER_RADIUS * Math.cos(radians);
             double by2 = ballPositionY + BALL_RADIUS * Math.sin(radians + Math.PI);
             double py2 = yValue + PLAYER_RADIUS * Math.sin(radians);
             boolean secondTest = Math.abs(bx2 - px2) <= closeCollisionMargin && Math.abs(by2 - py2) <= closeCollisionMargin;
-            if (secondTest) return true;
+            if (secondTest) {
+                players.get(id).hasJustHitBall();
+                return true;
+            }
         }
         return false;
     }
@@ -127,8 +127,9 @@ public class ServerController implements Initializable {
             ballPositionX = ball.getCenterX() + dx;
             ballPositionY = ball.getCenterY() + dy;
 
-            players.keySet().stream()
-                    .filter(ServerController.this::hasPlayerHitBall)
+            players.entrySet().stream()
+                    .filter(player -> player.getValue().canHitBallAgain())
+                    .filter(player -> hasPlayerHitBall(player.getKey()))
                     .forEach(id -> {
                         System.out.println("Client hit by ball:: " + id);
                         dx *= -1;
@@ -158,14 +159,8 @@ public class ServerController implements Initializable {
     }
 
     public void moveOtherPlayer(String id, double xValue, double yValue) {
-        Circle playerToMove = players.get(id);
+        Circle playerToMove = players.get(id).getCircle();
         if (playerToMove == null) return;
-
-//        if (hasPlayerHitBall(xValue, yValue)) {
-//            System.out.println("Ball has been hit by client :: " + id);
-//            dx *= -1;
-//            dy *= -1;
-//        }
         transitionNode(playerToMove, xValue, yValue, 150);
     }
 
