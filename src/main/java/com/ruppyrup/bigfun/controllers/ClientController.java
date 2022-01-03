@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.ResourceBundle;
 
@@ -101,7 +102,7 @@ public class ClientController implements Initializable {
     }
 
     public void moveOtherPlayer(String id, double xValue, double yValue) {
-        Circle playerToMove = players.get(id).getCircle();
+        Circle playerToMove = Optional.ofNullable(players.get(id)).map(Player::getCircle).orElse(null);
         if (playerToMove == null) return; // if own button or button doesn't exist
         transitionNode(playerToMove, xValue, yValue, 150);
     }

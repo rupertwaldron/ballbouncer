@@ -1,16 +1,17 @@
 package com.ruppyrup.bigfun.controllers;
 
+import com.ruppyrup.bigfun.common.Ball;
 import com.ruppyrup.bigfun.common.Player;
+import com.ruppyrup.bigfun.server.Collision;
 import com.ruppyrup.bigfun.server.EchoMultiServer;
+import com.ruppyrup.bigfun.server.HitResult;
 import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
-import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -20,6 +21,7 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static com.ruppyrup.bigfun.constants.BallConstants.BALL_RADIUS;
@@ -31,15 +33,13 @@ public class ServerController implements Initializable {
 
     private EchoMultiServer echoMultiServer;
     private final Map<String, Player> players = new HashMap<>();
-    private double ballPositionX;
-    private double ballPositionY;
     private double dx = 3;
     private double dy = 3;
 
     @FXML
     private AnchorPane anchorPane;
 
-    private Circle ball;
+    private Ball ball;
 
 
     @Override
@@ -47,7 +47,8 @@ public class ServerController implements Initializable {
         echoMultiServer = new EchoMultiServer(this);
         echoMultiServer.start();
 
-        ball = createCircle(BALL_RADIUS, Color.ORANGE, new Position(100, 100));
+        Circle ballCircle = createCircle(BALL_RADIUS, Color.ORANGE, new Position(100, 100));
+        ball = new Ball(ballCircle);
         bounceBall();
 
         echoMultiServer.setOnSucceeded(event -> System.out.println("Succeeded :: " + echoMultiServer.getValue()));
@@ -74,78 +75,36 @@ public class ServerController implements Initializable {
         players.remove(id);
     }
 
-    private boolean hasPlayerHitBall(String id) {
-
-        Circle player = players.get(id).getCircle();
-        double xValue = player.getCenterX();
-        double yValue = player.getCenterY();
-
-        int firstCollisionMargin = 10;
-
-        boolean theBallAndPlayerCloseEnoughToCollide =
-                Math.abs(ballPositionX - xValue) <=
-                        BALL_RADIUS + PLAYER_RADIUS + firstCollisionMargin &&
-                Math.abs(ballPositionY - yValue) <=
-                        BALL_RADIUS + PLAYER_RADIUS + firstCollisionMargin;
-
-        if (!theBallAndPlayerCloseEnoughToCollide) return false;
-
-        int closeCollisionMargin = 2;
-
-        int radiiPrecisionPoints = 100;
-        double radiiPrecision = (2 * Math.PI) / radiiPrecisionPoints;
-
-        for (int i = 0; i < radiiPrecisionPoints; i++) {
-            double radians = radiiPrecision * i;
-            double bx1 = ballPositionX + BALL_RADIUS * Math.cos(radians);
-            double px1 = xValue + PLAYER_RADIUS * Math.cos(radians + Math.PI);
-            double by1 = ballPositionY + BALL_RADIUS * Math.sin(radians);
-            double py1 = yValue + PLAYER_RADIUS * Math.sin(radians + Math.PI);
-
-            boolean firstTest = Math.abs(bx1 - px1) <= closeCollisionMargin && Math.abs(by1 - py1) <= closeCollisionMargin;
-            if (firstTest) {
-                players.get(id).hasJustHitBall();
-                return true;
-            }
-
-            double bx2 = ballPositionX + BALL_RADIUS * Math.cos(radians + Math.PI);
-            double px2 = xValue + PLAYER_RADIUS * Math.cos(radians);
-            double by2 = ballPositionY + BALL_RADIUS * Math.sin(radians + Math.PI);
-            double py2 = yValue + PLAYER_RADIUS * Math.sin(radians);
-            boolean secondTest = Math.abs(bx2 - px2) <= closeCollisionMargin && Math.abs(by2 - py2) <= closeCollisionMargin;
-            if (secondTest) {
-                players.get(id).hasJustHitBall();
-                return true;
-            }
-        }
-        return false;
-    }
 
     private void bounceBall() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), t -> {
             //move the ball
-            ballPositionX = ball.getCenterX() + dx;
-            ballPositionY = ball.getCenterY() + dy;
+            double ballPositionX = ball.getX() + dx;
+            double ballPositionY = ball.getY() + dy;
 
-            players.entrySet().stream()
+            HitResult hit = players.entrySet().stream()
                     .filter(player -> player.getValue().canHitBallAgain())
-                    .filter(player -> hasPlayerHitBall(player.getKey()))
-                    .forEach(id -> {
-                        System.out.println("Client hit by ball:: " + id);
-                        dx *= -1;
-                        dy *= -1;
-                    });
+                    .map(player -> Collision.hasPlayerHitBall(player.getValue(), ball))
+                    .filter(hitResult -> hitResult.isHit)
+                    .findFirst()
+                    .orElse(new HitResult(false, 0));
+
+            if (hit.isHit) {
+                System.out.println("Client hit by ball:: ");
+                dx *= -1.1;
+                dy *= -1.1;
+            }
 
             echoMultiServer.sendBallPosition(ballPositionX, ballPositionY);
 
-            ball.setCenterX(ballPositionX);
-            ball.setCenterY(ballPositionY);
+            ball.setX(ballPositionX);
+            ball.setY(ballPositionY);
 
             Bounds bounds = anchorPane.getLayoutBounds();
-            final boolean atRightBorder = ball.getCenterX() >= (bounds.getMaxX() - ball.getRadius());
-            final boolean atLeftBorder = ball.getCenterX() <= (bounds.getMinX() + ball.getRadius());
-            final boolean atBottomBorder = ball.getCenterY() >= (bounds.getMaxY() - ball.getRadius());
-            final boolean atTopBorder = ball.getCenterY() <= (bounds.getMinY() + ball.getRadius());
+            final boolean atRightBorder = ballPositionX >= (bounds.getMaxX() - ball.getRadius());
+            final boolean atLeftBorder = ballPositionX <= (bounds.getMinX() + ball.getRadius());
+            final boolean atBottomBorder = ballPositionY >= (bounds.getMaxY() - ball.getRadius());
+            final boolean atTopBorder = ballPositionY <= (bounds.getMinY() + ball.getRadius());
 
             if (atRightBorder || atLeftBorder) {
                 dx *= -1;
@@ -159,7 +118,7 @@ public class ServerController implements Initializable {
     }
 
     public void moveOtherPlayer(String id, double xValue, double yValue) {
-        Circle playerToMove = players.get(id).getCircle();
+        Circle playerToMove = Optional.ofNullable(players.get(id)).map(Player::getCircle).orElse(null);
         if (playerToMove == null) return;
         transitionNode(playerToMove, xValue, yValue, 150);
     }
