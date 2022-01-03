@@ -77,12 +77,48 @@ public class ServerController implements Initializable {
         Circle player = players.get(id);
         double xValue = player.getCenterX();
         double yValue = player.getCenterY();
-        return hasPlayerHitBall(xValue, yValue);
+        return collisionDetection(xValue, yValue);
     }
 
     private boolean hasPlayerHitBall(double xValue, double yValue) {
         return ballPositionX - BALL_RADIUS <= xValue + PLAYER_RADIUS && ballPositionX + BALL_RADIUS >= xValue - PLAYER_RADIUS &&
                 ballPositionY - BALL_RADIUS <= yValue + PLAYER_RADIUS && ballPositionY + BALL_RADIUS >= yValue + PLAYER_RADIUS;
+    }
+
+    private boolean collisionDetection(double xValue, double yValue) {
+        int firstCollisionMargin = 10;
+
+        boolean theBallAndPlayerCloseEnoughToCollide =
+                Math.abs(ballPositionX - xValue) <=
+                        BALL_RADIUS + PLAYER_RADIUS + firstCollisionMargin &&
+                Math.abs(ballPositionY - yValue) <=
+                        BALL_RADIUS + PLAYER_RADIUS + firstCollisionMargin;
+
+        if (!theBallAndPlayerCloseEnoughToCollide) return false;
+
+        int closeCollisionMargin = 2;
+
+        int radiiPrecisionPoints = 100;
+        double radiiPrecision = (2 * Math.PI) / radiiPrecisionPoints;
+
+        for (int i = 0; i < radiiPrecisionPoints; i++) {
+            double radians = radiiPrecision * i;
+            double bx1 = ballPositionX + BALL_RADIUS * Math.cos(radians);
+            double px1 = xValue + PLAYER_RADIUS * Math.cos(radians + Math.PI);
+            double by1 = ballPositionY + BALL_RADIUS * Math.sin(radians);
+            double py1 = yValue + PLAYER_RADIUS * Math.sin(radians + Math.PI);
+
+            boolean firstTest = Math.abs(bx1 - px1) <= closeCollisionMargin && Math.abs(by1 - py1) <= closeCollisionMargin;
+            if (firstTest) return true;
+
+            double bx2 = ballPositionX + BALL_RADIUS * Math.cos(radians + Math.PI);
+            double px2 = xValue + PLAYER_RADIUS * Math.cos(radians);
+            double by2 = ballPositionY + BALL_RADIUS * Math.sin(radians + Math.PI);
+            double py2 = yValue + PLAYER_RADIUS * Math.sin(radians);
+            boolean secondTest = Math.abs(bx2 - px2) <= closeCollisionMargin && Math.abs(by2 - py2) <= closeCollisionMargin;
+            if (secondTest) return true;
+        }
+        return false;
     }
 
     private void bounceBall() {
@@ -125,11 +161,11 @@ public class ServerController implements Initializable {
         Circle playerToMove = players.get(id);
         if (playerToMove == null) return;
 
-        if (hasPlayerHitBall(xValue, yValue)) {
-            System.out.println("Ball has been hit by client :: " + id);
-            dx *= -1;
-            dy *= -1;
-        }
+//        if (hasPlayerHitBall(xValue, yValue)) {
+//            System.out.println("Ball has been hit by client :: " + id);
+//            dx *= -1;
+//            dy *= -1;
+//        }
         transitionNode(playerToMove, xValue, yValue, 150);
     }
 
