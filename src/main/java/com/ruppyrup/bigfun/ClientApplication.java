@@ -21,3 +21,5 @@ public class ClientApplication extends Application {
         launch(args);
     }
 }
+
+class ClientLauncher {public static void main(String[] args) {ClientApplication.main(args);}}

@@ -58,6 +58,9 @@ public class ServerController implements Initializable {
 
     private Ball ball;
 
+    public Ball getBall() {
+        return ball;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

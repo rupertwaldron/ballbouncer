@@ -26,3 +26,5 @@ public class ServerApplication extends Application {
     }
 }
 
+class ServerLauncher {public static void main(String[] args) {ServerApplication.main(args);}}
+
