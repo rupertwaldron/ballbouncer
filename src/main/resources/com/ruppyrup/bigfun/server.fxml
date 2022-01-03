@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.layout.AnchorPane?>
 
 
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #382719#382719;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ruppyrup.bigfun.controllers.ServerController">
-
+   <children>
+      <JFXButton fx:id="resetButton" onAction="#reset" text="Reset" textFill="#c5ee0f" AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="0.0" />
+   </children>
 </AnchorPane>

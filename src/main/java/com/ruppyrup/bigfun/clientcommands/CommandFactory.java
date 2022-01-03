@@ -16,6 +16,7 @@ public class CommandFactory {
             case CO_ORD -> new MovePosition(animationController, input);
             case BALL_POSITION -> new BallPosition(animationController, input);
             case REMOVE_PLAYER -> new RemovePlayer(animationController, input);
+            case HIT_COUNT -> new AddHit(animationController, input);
             default -> throw new IllegalStateException("Unexpected value: " + echoCommands);
         };
     }

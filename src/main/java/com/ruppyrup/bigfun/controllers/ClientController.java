@@ -7,6 +7,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -41,6 +42,9 @@ public class ClientController implements Initializable {
     @FXML
     private AnchorPane anchorPane;
 
+    @FXML
+    private Label hitLabel;
+
     private Circle ball;
     private Circle myPlayer;
 
@@ -68,6 +72,7 @@ public class ClientController implements Initializable {
 
         myPlayer = createCircle(PLAYER_RADIUS, Color.RED, new Position(200, 200));
         ball = createCircle(BALL_RADIUS, Color.ORANGE, new Position(100, 100));
+        hitLabel.setText("0");
 
         echoClient.setOnSucceeded(event -> System.out.println("Succeeded :: " + echoClient.getValue()));
     }
@@ -125,5 +130,9 @@ public class ClientController implements Initializable {
         playerToRemove.setDisable(true);
         playerToRemove.setVisible(false);
         players.remove(id);
+    }
+
+    public void updateHitCount(String count) {
+        hitLabel.setText(count);
     }
 }

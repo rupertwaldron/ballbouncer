@@ -40,7 +40,7 @@ public class Collision {
 
             boolean firstTest = Math.abs(bx1 - px1) <= closeCollisionMargin && Math.abs(by1 - py1) <= closeCollisionMargin;
             if (firstTest) {
-                player.hasJustHitBall();
+//                player.hasJustHitBall();
                 System.out.println("Hit angle ball below = " + radians);
                 return new HitResult(true, radians);
             }
@@ -51,7 +51,7 @@ public class Collision {
             double py2 = playerY + PLAYER_RADIUS * Math.sin(radians);
             boolean secondTest = Math.abs(bx2 - px2) <= closeCollisionMargin && Math.abs(by2 - py2) <= closeCollisionMargin;
             if (secondTest) {
-                player.hasJustHitBall();
+//                player.hasJustHitBall();
                 System.out.println("Hit angle ball above = " + radians);
                 return new HitResult(true, radians);
             }

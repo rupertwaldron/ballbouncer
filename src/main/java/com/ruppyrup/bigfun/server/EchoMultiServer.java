@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.ADD_PLAYER;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.BALL_POSITION;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.CO_ORD;
+import static com.ruppyrup.bigfun.clientcommands.EchoCommands.HIT_COUNT;
 import static com.ruppyrup.bigfun.clientcommands.EchoCommands.REMOVE_PLAYER;
 
 public class EchoMultiServer extends Service<EchoServerResult>  {
@@ -63,6 +64,10 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
 
     public void sendBallPosition(double newXPosition, double newYPosition) {
         clients.forEach((id, writer) -> writer.println(BALL_POSITION + ">" + "all" + "%" + newXPosition + ":" + newYPosition));
+    }
+
+    public void sendHitCount(String id, int count) {
+        clients.get(id).println(HIT_COUNT+ ">" + count);
     }
 
     private class EchoClientHandler implements Runnable {

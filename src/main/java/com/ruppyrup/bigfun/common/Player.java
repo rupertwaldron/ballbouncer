@@ -40,6 +40,7 @@ public class Player {
     public boolean hasJustHitBall() {
         startTime = System.currentTimeMillis();
         timerStarted = true;
+        hitCount++;
         return justHitBall;
     }
 

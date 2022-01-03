@@ -1,5 +1,6 @@
 package com.ruppyrup.bigfun.controllers;
 
+import com.jfoenix.controls.JFXButton;
 import com.ruppyrup.bigfun.common.Ball;
 import com.ruppyrup.bigfun.common.Player;
 import com.ruppyrup.bigfun.server.Collision;
@@ -8,6 +9,7 @@ import com.ruppyrup.bigfun.server.HitResult;
 import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -38,6 +40,21 @@ public class ServerController implements Initializable {
 
     @FXML
     private AnchorPane anchorPane;
+
+    @FXML
+    private JFXButton resetButton;
+
+    @FXML
+    void reset(ActionEvent event) {
+        ball.setX(100);
+        ball.setY(100);
+        dx = 3;
+        dy = 3;
+        players.values().forEach(player -> {
+            player.setHitCount(0);
+            echoMultiServer.sendHitCount(player.getId(), 0);
+        });
+    }
 
     private Ball ball;
 
@@ -82,9 +99,16 @@ public class ServerController implements Initializable {
             double ballPositionX = ball.getX() + dx;
             double ballPositionY = ball.getY() + dy;
 
-            HitResult hit = players.entrySet().stream()
-                    .filter(player -> player.getValue().canHitBallAgain())
-                    .map(player -> Collision.hasPlayerHitBall(player.getValue(), ball))
+            HitResult hit = players.values().stream()
+                    .filter(Player::canHitBallAgain)
+                    .map(player -> {
+                        HitResult hitResult = Collision.hasPlayerHitBall(player, ball);
+                        if (hitResult.isHit) {
+                            player.hasJustHitBall();
+                            echoMultiServer.sendHitCount(player.getId(), player.getHitCount());
+                        }
+                        return hitResult;
+                    })
                     .filter(hitResult -> hitResult.isHit)
                     .findFirst()
                     .orElse(new HitResult(false, 0));
