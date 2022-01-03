@@ -20,7 +20,6 @@ import org.testfx.framework.junit5.ApplicationTest;
 
 
 class ServerApplicationTest extends ApplicationTest {
-    ServerController controller;
 
     @Override
     public void start(Stage stage) throws Exception {
