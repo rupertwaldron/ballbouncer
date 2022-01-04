@@ -6,6 +6,7 @@ import com.ruppyrup.bigfun.common.Player;
 import com.ruppyrup.bigfun.server.Collision;
 import com.ruppyrup.bigfun.server.EchoMultiServer;
 import com.ruppyrup.bigfun.server.HitResult;
+import com.ruppyrup.bigfun.server.Velocity;
 import com.ruppyrup.bigfun.utils.Position;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -35,8 +36,6 @@ public class ServerController implements Initializable {
 
     private EchoMultiServer echoMultiServer;
     private final Map<String, Player> players = new HashMap<>();
-    private double dx = 3;
-    private double dy = 3;
 
     @FXML
     private AnchorPane anchorPane;
@@ -48,8 +47,8 @@ public class ServerController implements Initializable {
     void reset(ActionEvent event) {
         ball.setX(100);
         ball.setY(100);
-        dx = 3;
-        dy = 3;
+        ball.getVelocity().setVelocityFromXAndY(3, 3);
+
         players.values().forEach(player -> {
             player.setHitCount(0);
             echoMultiServer.sendHitCount(player.getId(), 0);
@@ -68,7 +67,10 @@ public class ServerController implements Initializable {
         echoMultiServer.start();
 
         Circle ballCircle = createCircle(BALL_RADIUS, Color.ORANGE, new Position(100, 100));
-        ball = new Ball(ballCircle);
+        Velocity ballVelocity = new Velocity(3, 3);
+        ball = new Ball(ballCircle, ballVelocity);
+
+
         bounceBall();
 
         echoMultiServer.setOnSucceeded(event -> System.out.println("Succeeded :: " + echoMultiServer.getValue()));
@@ -99,8 +101,14 @@ public class ServerController implements Initializable {
     private void bounceBall() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), t -> {
             //move the ball
-            double ballPositionX = ball.getX() + dx;
-            double ballPositionY = ball.getY() + dy;
+            double ballPositionX = ball.getX() + ball.getVelocity().getxMagnitude();
+            double ballPositionY = ball.getY() + ball.getVelocity().getyMagnitude();
+
+            Velocity ballVelocity = ball.getVelocity();
+
+            double ballSpeed = ballVelocity.getMagnitude();
+            double ballDirection = ballVelocity.getRadianAngle();
+
 
             HitResult hit = players.values().stream()
                     .filter(Player::canHitBallAgain)
@@ -117,15 +125,11 @@ public class ServerController implements Initializable {
                     .orElse(new HitResult(false, 0));
 
             if (hit.isHit) {
+                System.out.println("Ball velocity 3  :: " + ballVelocity);
                 System.out.println("Client hit by ball:: ");
-                dx *= -1.1;
-                dy *= -1.1;
+                ball.getVelocity().setVelocityFromMagAndAngle(ballSpeed, hit.radians);
+                System.out.println("Ball velocity 4 :: " + ballVelocity);
             }
-
-            echoMultiServer.sendBallPosition(ballPositionX, ballPositionY);
-
-            ball.setX(ballPositionX);
-            ball.setY(ballPositionY);
 
             Bounds bounds = anchorPane.getLayoutBounds();
             final boolean atRightBorder = ballPositionX >= (bounds.getMaxX() - ball.getRadius());
@@ -134,11 +138,23 @@ public class ServerController implements Initializable {
             final boolean atTopBorder = ballPositionY <= (bounds.getMinY() + ball.getRadius());
 
             if (atRightBorder || atLeftBorder) {
-                dx *= -1;
+//                ballDirection = ballVelocity.getRadianAngle();
+//                System.out.println("Ball velocity 1 :: " + ballVelocity);
+                ballVelocity.setVelocityFromXAndY(-ballVelocity.getxMagnitude(), ballVelocity.getyMagnitude());
+//                System.out.println("Ball velocity 2 :: " + ballVelocity);
             }
+
             if (atBottomBorder || atTopBorder) {
-                dy *= -1;
+//                ballDirection = ballVelocity.getRadianAngle();
+//                System.out.println("Ball velocity 5 :: " + ballVelocity);
+                ballVelocity.setVelocityFromXAndY(ballVelocity.getxMagnitude(), -ballVelocity.getyMagnitude());
+//                System.out.println("Ball velocity 6 :: " + ballVelocity);
             }
+
+            echoMultiServer.sendBallPosition(ballPositionX, ballPositionY);
+
+            ball.setX(ballPositionX);
+            ball.setY(ballPositionY);
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();

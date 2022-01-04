@@ -88,7 +88,7 @@ public class EchoMultiServer extends Service<EchoServerResult>  {
 
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
-                    System.out.println("Client says :: " + inputLine);
+//                    System.out.println("Client says :: " + inputLine);
                     if (".".equals(inputLine)) {
                         out.println("bye");
                         break;

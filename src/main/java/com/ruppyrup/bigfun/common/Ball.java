@@ -1,14 +1,15 @@
 package com.ruppyrup.bigfun.common;
 
+import com.ruppyrup.bigfun.server.Velocity;
 import javafx.scene.shape.Circle;
-
-import java.util.Date;
 
 public class Ball {
     private final Circle circle;
+    private final Velocity velocity;
 
-    public Ball(Circle circle) {
+    public Ball(Circle circle, Velocity velocity) {
         this.circle = circle;
+        this.velocity = velocity;
     }
 
     public double getX() {
@@ -31,4 +32,7 @@ public class Ball {
         return circle.getRadius();
     }
 
+    public Velocity getVelocity() {
+        return velocity;
+    }
 }

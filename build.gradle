@@ -55,11 +55,11 @@ dependencies {
         exclude(group: 'org.openjfx')
     }
 
-    testImplementation group:'io.datafx', name: 'flow', version: '8.0.7'
+//    testImplementation group:'io.datafx', name: 'flow', version: '8.0.7'
 
-    testImplementation('org.testfx:testfx-core:4.0.16-alpha')
-    testImplementation('org.testfx:testfx-junit5:4.0.16-alpha')
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    implementation('org.testfx:testfx-core:4.0.16-alpha')
+    implementation('org.testfx:testfx-junit5:4.0.16-alpha')
+    implementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
 

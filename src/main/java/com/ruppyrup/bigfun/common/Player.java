@@ -29,7 +29,7 @@ public class Player {
     public boolean canHitBallAgain() {
         if (!timerStarted) return true;
         elapsedTime = (new Date()).getTime() - startTime;
-        if (elapsedTime < 300) {
+        if (elapsedTime < 500) {
             return false;
         } else {
             timerStarted = false;
