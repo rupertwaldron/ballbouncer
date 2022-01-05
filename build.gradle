@@ -13,11 +13,6 @@ repositories {
 }
 
 
-plugins.withType(JavaPlugin).configureEach {
-    java {
-        modularity.inferModulePath = true
-    }
-}
 
 ext {
     junitVersion = '5.8.2'
@@ -30,6 +25,9 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+java { modularity.inferModulePath = true }
+modularity.disableEffectiveArgumentsAdjustment()
+
 application {
     mainModule = 'com.ruppyrup.bigfun'
     mainClass = 'com.ruppyrup.bigfun.ServerApplication'
@@ -41,19 +39,7 @@ javafx {
 }
 
 dependencies {
-    implementation('org.controlsfx:controlsfx:11.1.0')
-    implementation('com.dlsc.formsfx:formsfx-core:11.3.2') {
-        exclude(group: 'org.openjfx')
-    }
-    implementation('net.synedra:validatorfx:0.1.13') {
-        exclude(group: 'org.openjfx')
-    }
-    implementation('org.kordamp.ikonli:ikonli-javafx:12.2.0')
-    implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
     implementation('com.jfoenix:jfoenix:9.0.10')
-    implementation('eu.hansolo:tilesfx:11.48') {
-        exclude(group: 'org.openjfx')
-    }
 
 //    testImplementation group:'io.datafx', name: 'flow', version: '8.0.7'
 
