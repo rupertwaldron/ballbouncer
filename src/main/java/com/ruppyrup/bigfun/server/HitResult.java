@@ -8,4 +8,12 @@ public class HitResult {
         this.isHit = isHit;
         this.radians = radians;
     }
+
+    @Override
+    public String toString() {
+        return "HitResult{" +
+            "isHit=" + isHit +
+            ", radians=" + radians +
+            '}';
+    }
 }
