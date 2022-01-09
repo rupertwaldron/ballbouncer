@@ -3,9 +3,6 @@ module com.ruppyrup.bigfun {
     requires javafx.fxml;
 
     requires com.jfoenix;
-    requires org.testfx;
-    requires org.junit.jupiter.api;
-    requires org.testfx.junit5;
 
     opens com.ruppyrup.bigfun to javafx.fxml;
     exports com.ruppyrup.bigfun;
