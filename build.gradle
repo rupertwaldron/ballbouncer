@@ -17,13 +17,13 @@ ext {
     junitVersion = '5.8.2'
 }
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 mainClassName = 'com.ruppyrup.bigfun.ServerApplication'
 
 javafx {
-    version = '17.0.1'
+    version = '11'
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
@@ -32,12 +32,14 @@ dependencies {
 
 //    testImplementation group:'io.datafx', name: 'flow', version: '8.0.7'
 
-    testImplementation('org.testfx:openjfx-monocle:1.8.0_20')
+    testImplementation('org.testfx:openjfx-monocle:jdk-11+26')
     testImplementation('org.testfx:testfx-core:4.0.16-alpha')
     testImplementation('org.testfx:testfx-junit5:4.0.16-alpha')
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
+
+test.systemProperty('headless', 'true')
 
 test {
     useJUnitPlatform()
